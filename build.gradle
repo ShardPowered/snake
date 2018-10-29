@@ -11,12 +11,13 @@ plugins {
     id 'java'
     id 'io.franzbecker.gradle-lombok' version '1.14'
     id 'com.github.johnrengelman.shadow' version '2.0.4'
+    id 'net.minecrell.licenser' version '0.4.1'
 }
 
 group 'me.tassu'
 version '1.0.0'
 
-defaultTasks 'build'
+defaultTasks 'licenseFormat', 'build'
 
 sourceCompatibility = 1.8
 
@@ -65,4 +66,14 @@ shadowJar {
     relocate 'com.google', 'me.tassu.easy.google'
     relocate 'com.typesafe.config', 'me.tassu.easy.lib.typesafe'
     relocate 'co.aikar', 'me.tassu.easy.lib.aikar'
+}
+
+jar {
+    from 'LICENSE'
+}
+
+license {
+    header = project.file('LICENSE')
+    include '**/*.java'
+    newLine = true
 }
