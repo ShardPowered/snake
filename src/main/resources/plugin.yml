@@ -1,0 +1,5 @@
+name: Snake
+main: me.tassu.snake.SnakePlugin
+version: ${pluginVersion}
+depend: [Easy]
+api-version: 1.13

@@ -1,0 +1,68 @@
+buildscript {
+    repositories {
+        jcenter()
+    }
+    dependencies {
+        classpath "com.github.jengelman.gradle.plugins:shadow:2.0.2"
+    }
+}
+
+plugins {
+    id 'java'
+    id 'io.franzbecker.gradle-lombok' version '1.14'
+    id 'com.github.johnrengelman.shadow' version '2.0.4'
+}
+
+group 'me.tassu'
+version '1.0.0'
+
+defaultTasks 'build'
+
+sourceCompatibility = 1.8
+
+repositories {
+    mavenCentral()
+    maven { url "file:///home/tassu/maven" } // todo remove before release
+    maven {
+        name 'aikar-repo'
+        url "https://ci.emc.gs/nexus/content/groups/aikar/"
+    }
+    maven {
+        name 'sponge'
+        url 'https://repo.spongepowered.org/maven'
+    }
+    maven {
+        name 'paper-repo'
+        url 'https://papermc.io/repo/repository/maven-public'
+    }
+    maven {
+        name = 'tassu-repo'
+        url = 'https://maven.tassu.me/'
+    }
+}
+
+dependencies {
+    compileOnly 'com.destroystokyo.paper:paper-api:1.13.1-R0.1-SNAPSHOT'
+    compileOnly "me.tassu:easy:1.0.0"
+
+    compile 'org.mongodb:mongodb-driver-sync:3.8.2'
+}
+
+processResources {
+    from(sourceSets.main.resources.srcDirs) {
+        expand 'pluginVersion': project.version
+        include 'plugin.yml'
+    }
+}
+
+build.dependsOn(shadowJar)
+
+shadowJar {
+    classifier = null
+
+    relocate 'me.tassu.util', 'me.tassu.easy.util'
+    relocate 'ninja.leaping.configurate', 'me.tassu.easy.lib.configurate'
+    relocate 'com.google', 'me.tassu.easy.google'
+    relocate 'com.typesafe.config', 'me.tassu.easy.lib.typesafe'
+    relocate 'co.aikar', 'me.tassu.easy.lib.aikar'
+}
