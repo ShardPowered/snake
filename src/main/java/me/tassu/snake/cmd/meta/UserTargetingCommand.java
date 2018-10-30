@@ -24,30 +24,40 @@
 
 package me.tassu.snake.cmd.meta;
 
-import com.google.inject.Singleton;
-import lombok.Getter;
-import me.tassu.easy.register.config.Config;
-import me.tassu.snake.util.Chat;
-import ninja.leaping.configurate.objectmapping.Setting;
+import com.google.inject.Inject;
+import lombok.val;
+import me.tassu.snake.user.UserParser;
+import me.tassu.snake.user.rank.Rank;
+import org.bukkit.attribute.Attribute;
+import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 
-@Getter
-@Singleton
-@Config.Name("commands")
-public class CommandConfig extends Config<CommandConfig> {
+import java.util.List;
 
-    private String prefix = Chat.BLUE + Chat.BIG_BLOCK + " Command " + Chat.SMALL_ARROWS_RIGHT +
-            Chat.GRAY + " ";
+public abstract class UserTargetingCommand extends BaseCommand {
 
-    @Setting("permission")
-    private String permissionMessage = prefix + "This command requires permission level " + Chat.BLUE + "{0}" + Chat.GRAY + "!";
+    @Inject
+    private UserParser parser;
 
-    @Setting
-    private String usageMessage = prefix + "Usage: " + Chat.WHITE + "{0}";
+    @Inject
+    private CommandConfig config;
 
-    @Setting
-    private String setRankMessage = prefix + "Set rank of " + Chat.BLUE + "{0}" + Chat.GRAY + " to " + Chat.WHITE + "{1}" + Chat.GRAY + ".";
+    public UserTargetingCommand(String name, Rank rank) {
+        super(name, rank);
+    }
 
-    @Setting
-    private String entityAffectSuccess = prefix + "Affected " + Chat.WHITE + "{0}" + Chat.GRAY + " entities.";
+    @Override
+    public void run(CommandSender sender, String label, List<String> args) {
+        if (args.isEmpty()) {
+            sendMessage(sender, config.getUsageMessage(), getUsage());
+            return;
+        }
+
+        val target = parser.select(args.get(0), sender instanceof Player ? ((Player) sender) : null);
+        target.forEach(this::run);
+        sendMessage(sender, config.getEntityAffectSuccess(), target.size());
+    }
+
+    public abstract void run(Player player);
 
 }

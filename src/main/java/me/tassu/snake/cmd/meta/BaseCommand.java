@@ -36,6 +36,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import java.util.List;
+import java.util.Set;
 
 public abstract class BaseCommand extends Command {
 
@@ -53,7 +54,7 @@ public abstract class BaseCommand extends Command {
         super.check(sender, label, args);
 
         if (sender instanceof Player) {
-            val user = registry.get(((Player) sender).getUniqueId());
+            val user = registry.get((Player) sender);
             if (user == null || user.getRank().getWeight() < rank.getWeight()) {
                 throw new MissingPermissionException(rank.name());
             }
@@ -62,6 +63,11 @@ public abstract class BaseCommand extends Command {
 
     protected void sendMessage(CommandSender sender, String message, Object... replacements) {
         sender.sendMessage(Chat.format(message, replacements));
+    }
+
+    protected String nameOrCount(Set<Player> input) {
+        if (input.size() == 1) return registry.get(input.stream().findFirst().get()).getLastNickname();
+        return input.size() + " players";
     }
 
 }

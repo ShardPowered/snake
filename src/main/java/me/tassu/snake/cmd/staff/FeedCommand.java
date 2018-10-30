@@ -22,32 +22,28 @@
  * SOFTWARE.
  */
 
-package me.tassu.snake.cmd.meta;
+package me.tassu.snake.cmd.staff;
 
 import com.google.inject.Singleton;
-import lombok.Getter;
-import me.tassu.easy.register.config.Config;
-import me.tassu.snake.util.Chat;
-import ninja.leaping.configurate.objectmapping.Setting;
+import me.tassu.easy.register.command.Aliases;
+import me.tassu.snake.cmd.meta.UserTargetingCommand;
+import me.tassu.snake.user.rank.Rank;
+import org.bukkit.entity.Player;
 
-@Getter
 @Singleton
-@Config.Name("commands")
-public class CommandConfig extends Config<CommandConfig> {
+@Aliases({"feed", "eat"})
+public class FeedCommand extends UserTargetingCommand {
 
-    private String prefix = Chat.BLUE + Chat.BIG_BLOCK + " Command " + Chat.SMALL_ARROWS_RIGHT +
-            Chat.GRAY + " ";
+    public FeedCommand() {
+        super("feed", Rank.MODERATOR);
+        this.setUsage("/feed <users>");
+        this.setDescription("Used to feed a player.");
+    }
 
-    @Setting("permission")
-    private String permissionMessage = prefix + "This command requires permission level " + Chat.BLUE + "{0}" + Chat.GRAY + "!";
-
-    @Setting
-    private String usageMessage = prefix + "Usage: " + Chat.WHITE + "{0}";
-
-    @Setting
-    private String setRankMessage = prefix + "Set rank of " + Chat.BLUE + "{0}" + Chat.GRAY + " to " + Chat.WHITE + "{1}" + Chat.GRAY + ".";
-
-    @Setting
-    private String entityAffectSuccess = prefix + "Affected " + Chat.WHITE + "{0}" + Chat.GRAY + " entities.";
+    @Override
+    public void run(Player player) {
+        player.setFoodLevel(20);
+        player.setSaturation(20);
+    }
 
 }

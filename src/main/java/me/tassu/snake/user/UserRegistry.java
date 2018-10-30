@@ -92,7 +92,7 @@ public class UserRegistry implements IRegistrable {
         return users.get(uuid);
     }
 
-    private User get(Player player) {
+    public User get(Player player) {
         return get(player.getUniqueId());
     }
 
@@ -102,7 +102,7 @@ public class UserRegistry implements IRegistrable {
 
         val document = new Document(new LinkedHashMap<>());
 
-        for (String key : queue.keySet()) {
+        for (val key : queue.keySet()) {
             document.put(key, queue.get(key));
         }
 
@@ -130,15 +130,18 @@ public class UserRegistry implements IRegistrable {
 
     @EventHandler(ignoreCancelled = true)
     public void onPlayerJoin(PlayerJoinEvent event) {
-        val user = get(event.getPlayer());
-        user.setNickname(event.getPlayer().getName());
-        user.updateTag();
-
-        user.getPlayer().ifPresent(it -> it.sendMessage(Chat.format("Your rank is {0}", user.getRank().name())));
+        chain
+                .newChain()
+                .delay(5)
+                .asyncFirst(() -> get(event.getPlayer()))
+                .syncLast(user -> {
+                    user.setNickname(event.getPlayer().getName());
+                    user.updateTag();
+                }).execute();
     }
 
     public void cleanup() {
-        for (UUID uuid : users.keySet()) {
+        for (val uuid : users.keySet()) {
             save(users.get(uuid));
 
             if (locked.containsKey(uuid)) {

@@ -22,13 +22,12 @@
  * SOFTWARE.
  */
 
-package me.tassu.snake.cmd;
+package me.tassu.snake.cmd.staff.admin;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.val;
 import me.tassu.easy.register.command.Aliases;
-import me.tassu.easy.register.command.error.CommandException;
 import me.tassu.snake.cmd.meta.BaseCommand;
 import me.tassu.snake.cmd.meta.CommandConfig;
 import me.tassu.snake.user.UserParser;
@@ -55,12 +54,12 @@ public class SetRankCommand extends BaseCommand {
 
     public SetRankCommand() {
         super("setrank", Rank.ADMIN);
-        this.usageMessage = "/setrank <users> <rank>";
+        this.setUsage("/setrank <users> <rank>");
         this.setDescription("Used to set a rank for a player.");
     }
 
     @Override
-    public void run(CommandSender sender, String label, List<String> args) throws CommandException {
+    public void run(CommandSender sender, String label, List<String> args) {
         if (args.size() != 2) {
             sendMessage(sender, config.getUsageMessage(), getUsage());
             return;
@@ -69,6 +68,7 @@ public class SetRankCommand extends BaseCommand {
         val rank = Rank.byName(args.get(1));
         val target = parser.select(args.get(0), sender instanceof Player ? ((Player) sender) : null);
         target.stream().map(Entity::getUniqueId).map(registry::get).forEach(it -> it.setRank(rank));
-        sendMessage(sender, config.getGeneralSuccess(), target.size());
+
+        sendMessage(sender, config.getSetRankMessage(), nameOrCount(target), rank.name());
     }
 }

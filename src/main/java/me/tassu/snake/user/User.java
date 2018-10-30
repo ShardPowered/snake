@@ -45,6 +45,10 @@ public class User {
     @Getter(AccessLevel.PACKAGE)
     private Map<String, Object> saveQueue = new HashMap<>();
 
+    private void addToSaveQueue(String key, Object value) {
+        saveQueue.put(key, value);
+    }
+
     private UUID uuid;
 
     private Rank rank;
@@ -107,10 +111,6 @@ public class User {
             player.setPlayerListName(rank.getTag() + getLastNickname());
             player.setCustomName(rank.getTag() + getLastNickname());
         });
-    }
-
-    private void addToSaveQueue(String key, Object value) {
-        saveQueue.put(key, value);
     }
 
     public boolean isOnline() {

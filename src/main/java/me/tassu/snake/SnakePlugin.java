@@ -29,8 +29,9 @@ import me.tassu.easy.api.binder.BindManager;
 import me.tassu.easy.api.message.IMessageProvider;
 import me.tassu.easy.register.config.Config;
 import me.tassu.simple.TaskChainModule;
-import me.tassu.snake.cmd.HealCommand;
-import me.tassu.snake.cmd.SetRankCommand;
+import me.tassu.snake.cmd.staff.admin.SetRankCommand;
+import me.tassu.snake.cmd.staff.FeedCommand;
+import me.tassu.snake.cmd.staff.HealCommand;
 import me.tassu.snake.cmd.meta.CommandConfig;
 import me.tassu.snake.db.MongoConfig;
 import me.tassu.snake.db.MongoManager;
@@ -57,6 +58,7 @@ public final class SnakePlugin extends EasyPlugin {
                 CommandConfig.class,
 
                 SetRankCommand.class,
+                FeedCommand.class,
                 HealCommand.class
         );
     }
