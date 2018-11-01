@@ -24,35 +24,26 @@
 
 package me.tassu.snake.cmd.meta;
 
+import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import lombok.Getter;
-import me.tassu.easy.register.config.Config;
+import lombok.val;
+import me.tassu.easy.register.core.IRegistrable;
 import me.tassu.snake.util.Chat;
-import ninja.leaping.configurate.objectmapping.Setting;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 
-@Getter
 @Singleton
-@Config.Name("commands")
-public class CommandConfig extends Config<CommandConfig> {
+public class NoPrefixedCommand implements IRegistrable {
 
-    private String prefix = Chat.prefix("Command");
+    @Inject
+    private CommandConfig config;
 
-    @Setting("permission")
-    private String permissionMessage = prefix + "This command requires permission level " + Chat.BLUE + "{0}" + Chat.GRAY + "!";
-
-    @Setting("usage")
-    private String usageMessage = prefix + "Usage: " + Chat.WHITE + "{0}";
-
-    @Setting("rank-set")
-    private String setRankMessage = prefix + "Set rank of " + Chat.BLUE + "{0}" + Chat.GRAY + " to " + Chat.WHITE + "{1}" + Chat.GRAY + ".";
-
-    @Setting("general-affected")
-    private String entityAffectSuccess = prefix + "Affected " + Chat.WHITE + "{0}" + Chat.GRAY + " entities.";
-
-    @Setting(value = "prefixed-command", comment = "Error message when a prefixed command (\"plugin:command\") is used.")
-    private String noPrefixing = Chat.prefix(Chat.RED, "Command") + "Please do not use prefixed commands.";
-
-    @Setting("uptime")
-    private String uptimeMessage = prefix + "The server has been up for " + Chat.WHITE + "{0}" + Chat.GRAY + ".";
-
+    @EventHandler(ignoreCancelled = true)
+    public void onCommand(PlayerCommandPreprocessEvent event) {
+        val parts = event.getMessage().split(" ");
+        if (parts[0].contains(":")) {
+            event.getPlayer().sendMessage(Chat.format(config.getNoPrefixing()));
+            event.setCancelled(true);
+        }
+    }
 }

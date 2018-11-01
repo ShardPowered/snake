@@ -28,13 +28,39 @@ import com.google.inject.Inject;
 import lombok.val;
 import me.tassu.snake.user.UserParser;
 import me.tassu.snake.user.rank.Rank;
-import org.bukkit.attribute.Attribute;
+import me.tassu.util.ArrayUtil;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import java.util.List;
+import java.util.Set;
 
 public abstract class UserTargetingCommand extends BaseCommand {
+
+    private boolean useArguments;
+    private int requireArguments;
+
+    @SuppressWarnings("WeakerAccess")
+    public UserTargetingCommand useArguments() {
+        this.useArguments = true;
+        return this;
+    }
+
+    @SuppressWarnings({"UnusedReturnValue", "WeakerAccess"})
+    public UserTargetingCommand requireArguments(int requireArguments) {
+        this.requireArguments = requireArguments;
+        return useArguments();
+    }
+
+    private List<String> arguments;
+
+    protected List<String> getArguments() {
+        if (arguments == null) {
+            throw new IllegalStateException("whoops");
+        }
+
+        return arguments;
+    }
 
     @Inject
     private UserParser parser;
@@ -47,17 +73,35 @@ public abstract class UserTargetingCommand extends BaseCommand {
     }
 
     @Override
-    public void run(CommandSender sender, String label, List<String> args) {
+    public final void run(CommandSender sender, String label, List<String> args) {
         if (args.isEmpty()) {
             sendMessage(sender, config.getUsageMessage(), getUsage());
             return;
         }
 
-        val target = parser.select(args.get(0), sender instanceof Player ? ((Player) sender) : null);
-        target.forEach(this::run);
-        sendMessage(sender, config.getEntityAffectSuccess(), target.size());
+        if (useArguments) {
+            arguments = ArrayUtil.withoutFirst(args);
+
+            if (arguments.size() < requireArguments) {
+                arguments = null;
+                sendMessage(sender, config.getUsageMessage(), getUsage());
+                return;
+            }
+        }
+
+        try {
+            val target = parser.select(args.get(0), sender instanceof Player ? ((Player) sender) : null);
+            target.forEach(this::run);
+            sendSuccessMessage(sender, target);
+        } finally {
+            arguments = null;
+        }
     }
 
     public abstract void run(Player player);
+
+    protected void sendSuccessMessage(CommandSender sender, Set<Player> target) {
+        sendMessage(sender, config.getEntityAffectSuccess(), target.size());
+    }
 
 }

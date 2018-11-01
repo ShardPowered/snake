@@ -73,6 +73,15 @@ public class Chat {
     public static final String BIG_HORIZONTAL_LINE = "▍";
     public static final String SMALL_HORIZONTAL_LINE = "▏";
 
+
+    public static String prefix(String title) {
+        return prefix(BLUE, title);
+    }
+
+    public static String prefix(String color, String title) {
+        return color + BIG_BLOCK + " " + title + " " + DARK_GRAY + SMALL_ARROWS_RIGHT + GRAY + " ";
+    }
+
     public static String format(String input, Object... replacements) {
         return ChatColor.translateAlternateColorCodes('&', MessageFormat.format(input, replacements));
     }

@@ -66,7 +66,7 @@ public abstract class BaseCommand extends Command {
     }
 
     protected String nameOrCount(Set<Player> input) {
-        if (input.size() == 1) return registry.get(input.stream().findFirst().get()).getLastNickname();
+        if (input.size() == 1) return registry.get(input.stream().findFirst().get()).getPrefixedName();
         return input.size() + " players";
     }
 

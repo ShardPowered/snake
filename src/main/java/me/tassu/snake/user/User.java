@@ -108,8 +108,8 @@ public class User {
 
     public void updateTag() {
         this.getPlayer().ifPresent(player -> {
-            player.setPlayerListName(rank.getTag() + getLastNickname());
-            player.setCustomName(rank.getTag() + getLastNickname());
+            player.setPlayerListName(getPrefixedName());
+            player.setCustomName(getPrefixedName());
         });
     }
 
@@ -125,4 +125,7 @@ public class User {
         return player;
     }
 
+    public String getPrefixedName() {
+        return getRank().getTag() + getLastNickname();
+    }
 }

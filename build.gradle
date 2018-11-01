@@ -46,6 +46,7 @@ dependencies {
     compileOnly 'com.destroystokyo.paper:paper-api:1.13.1-R0.1-SNAPSHOT'
     compileOnly "me.tassu:easy:1.0.0"
 
+    compile "me.tassu.util:core:1.0.01"
     compile 'org.mongodb:mongodb-driver-sync:3.8.2'
 }
 

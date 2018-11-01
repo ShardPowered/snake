@@ -22,48 +22,28 @@
  * SOFTWARE.
  */
 
-package me.tassu.snake.cmd.staff.admin;
+package me.tassu.snake.cmd.user;
 
-import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import lombok.val;
 import me.tassu.easy.register.command.Aliases;
-import me.tassu.snake.cmd.meta.CommandConfig;
-import me.tassu.snake.cmd.meta.UserTargetingCommand;
-import me.tassu.snake.user.UserRegistry;
+import me.tassu.snake.cmd.meta.BaseCommand;
 import me.tassu.snake.user.rank.Rank;
+import me.tassu.snake.util.Chat;
 import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
 
-import java.util.Set;
+import java.util.List;
 
 @Singleton
-@Aliases({"setrank"})
-public class SetRankCommand extends UserTargetingCommand {
+@Aliases({"help", "commands", "?"})
+public class HelpCommand extends BaseCommand {
 
-    @Inject
-    private UserRegistry registry;
-
-    @Inject
-    private CommandConfig config;
-
-    public SetRankCommand() {
-        super("setrank", Rank.ADMIN);
-        this.setUsage("/setrank <users> <rank>");
-        this.setDescription("Used to set a rank for a player.");
-
-        this.requireArguments(1);
+    public HelpCommand() {
+        super("help", Rank.MEMBER);
+        this.setUsage("/help");
     }
 
     @Override
-    public void run(Player player) {
-        val rank = Rank.byName(getArguments().get(0));
-        registry.get(player).setRank(rank);
-    }
-
-    @Override
-    protected void sendSuccessMessage(CommandSender sender, Set<Player> target) {
-        val rank = Rank.byName(getArguments().get(0));
-        sendMessage(sender, config.getSetRankMessage(), nameOrCount(target), rank.name());
+    protected void run(CommandSender sender, String label, List<String> args) {
+        sender.sendMessage(Chat.prefix("Help") + "Coming soon.");
     }
 }

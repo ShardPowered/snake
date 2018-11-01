@@ -22,48 +22,38 @@
  * SOFTWARE.
  */
 
-package me.tassu.snake.cmd.staff.admin;
+package me.tassu.snake.chat;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.val;
-import me.tassu.easy.register.command.Aliases;
-import me.tassu.snake.cmd.meta.CommandConfig;
-import me.tassu.snake.cmd.meta.UserTargetingCommand;
+import me.tassu.easy.register.core.IRegistrable;
 import me.tassu.snake.user.UserRegistry;
-import me.tassu.snake.user.rank.Rank;
-import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
+import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
+import org.bukkit.event.player.AsyncPlayerChatEvent;
 
-import java.util.Set;
+import java.text.MessageFormat;
 
 @Singleton
-@Aliases({"setrank"})
-public class SetRankCommand extends UserTargetingCommand {
+public class ChatFormatter implements IRegistrable {
 
     @Inject
     private UserRegistry registry;
 
     @Inject
-    private CommandConfig config;
+    private ChatConfig config;
 
-    public SetRankCommand() {
-        super("setrank", Rank.ADMIN);
-        this.setUsage("/setrank <users> <rank>");
-        this.setDescription("Used to set a rank for a player.");
+    @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
+    public void onAsyncPlayerChat(AsyncPlayerChatEvent event) {
+        event.setCancelled(true);
 
-        this.requireArguments(1);
-    }
-
-    @Override
-    public void run(Player player) {
-        val rank = Rank.byName(getArguments().get(0));
-        registry.get(player).setRank(rank);
-    }
-
-    @Override
-    protected void sendSuccessMessage(CommandSender sender, Set<Player> target) {
-        val rank = Rank.byName(getArguments().get(0));
-        sendMessage(sender, config.getSetRankMessage(), nameOrCount(target), rank.name());
+        val sender = registry.get(event.getPlayer());
+        val message = MessageFormat.format(ChatColor.translateAlternateColorCodes('&', config.getFormat()),
+                sender.getPrefixedName(), event.getMessage());
+        event.getRecipients().forEach(it -> it.sendMessage(message));
+        Bukkit.getConsoleSender().sendMessage(message);
     }
 }

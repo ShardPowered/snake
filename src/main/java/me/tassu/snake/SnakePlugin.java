@@ -27,20 +27,22 @@ package me.tassu.snake;
 import me.tassu.easy.EasyPlugin;
 import me.tassu.easy.api.binder.BindManager;
 import me.tassu.easy.api.message.IMessageProvider;
-import me.tassu.easy.register.config.Config;
 import me.tassu.simple.TaskChainModule;
-import me.tassu.snake.cmd.staff.admin.SetRankCommand;
+import me.tassu.snake.chat.ChatConfig;
+import me.tassu.snake.chat.ChatFormatter;
+import me.tassu.snake.cmd.meta.CommandConfig;
+import me.tassu.snake.cmd.meta.NoPrefixedCommand;
 import me.tassu.snake.cmd.staff.FeedCommand;
 import me.tassu.snake.cmd.staff.HealCommand;
-import me.tassu.snake.cmd.meta.CommandConfig;
+import me.tassu.snake.cmd.staff.admin.SetRankCommand;
+import me.tassu.snake.cmd.user.HelpCommand;
+import me.tassu.snake.cmd.user.UptimeCommand;
 import me.tassu.snake.db.MongoConfig;
 import me.tassu.snake.db.MongoManager;
 import me.tassu.snake.user.UserRegistry;
 import me.tassu.snake.user.UserSaver;
 import me.tassu.snake.user.rank.RankUtil;
 import me.tassu.snake.util.Messager;
-
-import static me.tassu.cfg.ConfigUtil.run;
 
 public final class SnakePlugin extends EasyPlugin {
 
@@ -56,6 +58,14 @@ public final class SnakePlugin extends EasyPlugin {
                 RankUtil.class,
 
                 CommandConfig.class,
+                ChatConfig.class,
+
+                ChatFormatter.class,
+
+                NoPrefixedCommand.class,
+
+                HelpCommand.class,
+                UptimeCommand.class,
 
                 SetRankCommand.class,
                 FeedCommand.class,
@@ -68,12 +78,6 @@ public final class SnakePlugin extends EasyPlugin {
         // save ALL users
         getModule(UserRegistry.class)
                 .ifPresent(UserRegistry::cleanup);
-
-        // save configurations
-        getRegistrableSet().stream()
-                .filter(Config.class::isInstance)
-                .map(Config.class::cast)
-                .forEach(config -> run((config::save)));
     }
 
     @Override

@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-package me.tassu.snake.cmd.meta;
+package me.tassu.snake.chat;
 
 import com.google.inject.Singleton;
 import lombok.Getter;
@@ -32,27 +32,10 @@ import ninja.leaping.configurate.objectmapping.Setting;
 
 @Getter
 @Singleton
-@Config.Name("commands")
-public class CommandConfig extends Config<CommandConfig> {
+@Config.Name("chat")
+public class ChatConfig extends Config<ChatConfig> {
 
-    private String prefix = Chat.prefix("Command");
-
-    @Setting("permission")
-    private String permissionMessage = prefix + "This command requires permission level " + Chat.BLUE + "{0}" + Chat.GRAY + "!";
-
-    @Setting("usage")
-    private String usageMessage = prefix + "Usage: " + Chat.WHITE + "{0}";
-
-    @Setting("rank-set")
-    private String setRankMessage = prefix + "Set rank of " + Chat.BLUE + "{0}" + Chat.GRAY + " to " + Chat.WHITE + "{1}" + Chat.GRAY + ".";
-
-    @Setting("general-affected")
-    private String entityAffectSuccess = prefix + "Affected " + Chat.WHITE + "{0}" + Chat.GRAY + " entities.";
-
-    @Setting(value = "prefixed-command", comment = "Error message when a prefixed command (\"plugin:command\") is used.")
-    private String noPrefixing = Chat.prefix(Chat.RED, "Command") + "Please do not use prefixed commands.";
-
-    @Setting("uptime")
-    private String uptimeMessage = prefix + "The server has been up for " + Chat.WHITE + "{0}" + Chat.GRAY + ".";
+    @Setting
+    public String format = Chat.GREEN + "{0}" + Chat.RESET + " " + Chat.DARK_GRAY + Chat.SMALL_ARROWS_RIGHT + " " + Chat.WHITE + "{1}";
 
 }
