@@ -31,7 +31,7 @@ import me.tassu.easy.register.command.Aliases;
 import me.tassu.snake.cmd.meta.CommandConfig;
 import me.tassu.snake.cmd.meta.UserTargetingCommand;
 import me.tassu.snake.user.UserRegistry;
-import me.tassu.snake.user.rank.Rank;
+import me.tassu.snake.user.rank.RankConfig;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -45,10 +45,13 @@ public class SetRankCommand extends UserTargetingCommand {
     private UserRegistry registry;
 
     @Inject
+    private RankConfig rankConfig;
+
+    @Inject
     private CommandConfig config;
 
     public SetRankCommand() {
-        super("setrank", Rank.ADMIN);
+        super("setrank");
         this.setUsage("/setrank <users> <rank>");
         this.setDescription("Used to set a rank for a player.");
 
@@ -57,13 +60,13 @@ public class SetRankCommand extends UserTargetingCommand {
 
     @Override
     public void run(Player player) {
-        val rank = Rank.byName(getArguments().get(0));
+        val rank = rankConfig.byName(getArguments().get(0));
         registry.get(player).setRank(rank);
     }
 
     @Override
     protected void sendSuccessMessage(CommandSender sender, Set<Player> target) {
-        val rank = Rank.byName(getArguments().get(0));
-        sendMessage(sender, config.getSetRankMessage(), nameOrCount(target), rank.name());
+        val rank = rankConfig.byName(getArguments().get(0));
+        sendMessage(sender, config.getLocale().getSetRankMessage(), nameOrCount(target), rank.getName());
     }
 }

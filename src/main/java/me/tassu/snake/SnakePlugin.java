@@ -24,15 +24,19 @@
 
 package me.tassu.snake;
 
+import com.google.inject.Inject;
+import io.papermc.lib.PaperLib;
 import me.tassu.easy.EasyPlugin;
 import me.tassu.easy.api.binder.BindManager;
 import me.tassu.easy.api.message.IMessageProvider;
+import me.tassu.easy.log.Log;
 import me.tassu.simple.TaskChainModule;
 import me.tassu.snake.chat.ChatConfig;
 import me.tassu.snake.chat.ChatFormatter;
 import me.tassu.snake.cmd.meta.CommandConfig;
 import me.tassu.snake.cmd.meta.NoPrefixedCommand;
 import me.tassu.snake.cmd.staff.FeedCommand;
+import me.tassu.snake.cmd.staff.GameModeCommand;
 import me.tassu.snake.cmd.staff.HealCommand;
 import me.tassu.snake.cmd.staff.admin.SetRankCommand;
 import me.tassu.snake.cmd.user.HelpCommand;
@@ -41,13 +45,27 @@ import me.tassu.snake.db.MongoConfig;
 import me.tassu.snake.db.MongoManager;
 import me.tassu.snake.user.UserRegistry;
 import me.tassu.snake.user.UserSaver;
+import me.tassu.snake.user.rank.RankConfig;
 import me.tassu.snake.user.rank.RankUtil;
 import me.tassu.snake.util.Messager;
 
 public final class SnakePlugin extends EasyPlugin {
 
+    @Inject
+    private Log log;
+
     @Override
     protected void init() {
+        if (!PaperLib.isPaper()) {
+            log.error("Snake does heavily depend on");
+            log.error("Paper as a server software.");
+            log.error("");
+            log.error("Learn more about Paper: https://papermc.io");
+
+            getServer().getPluginManager().disablePlugin(this);
+            return;
+        }
+
         registerAll(
                 MongoConfig.class,
                 MongoManager.class,
@@ -58,6 +76,7 @@ public final class SnakePlugin extends EasyPlugin {
                 RankUtil.class,
 
                 CommandConfig.class,
+                RankConfig.class,
                 ChatConfig.class,
 
                 ChatFormatter.class,
@@ -67,6 +86,7 @@ public final class SnakePlugin extends EasyPlugin {
                 HelpCommand.class,
                 UptimeCommand.class,
 
+                GameModeCommand.class,
                 SetRankCommand.class,
                 FeedCommand.class,
                 HealCommand.class

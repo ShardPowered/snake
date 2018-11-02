@@ -26,13 +26,16 @@ package me.tassu.snake.cmd.meta;
 
 import com.google.inject.Inject;
 import lombok.val;
+import me.tassu.easy.log.Log;
 import me.tassu.easy.register.command.Command;
 import me.tassu.easy.register.command.error.CommandException;
 import me.tassu.easy.register.command.error.MissingPermissionException;
 import me.tassu.snake.user.UserRegistry;
 import me.tassu.snake.user.rank.Rank;
+import me.tassu.snake.user.rank.RankConfig;
 import me.tassu.snake.util.Chat;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 
 import java.util.List;
@@ -40,13 +43,31 @@ import java.util.Set;
 
 public abstract class BaseCommand extends Command {
 
+    @Inject private Log log;
+
+    @Inject private CommandConfig commandConfig;
+    @Inject private RankConfig rankConfig;
+
     @Inject private UserRegistry registry;
 
-    private Rank rank;
-
-    public BaseCommand(String name, Rank rank) {
+    public BaseCommand(String name) {
         super(name);
-        this.rank = rank;
+    }
+
+    @Override
+    public void register() {
+        if (!commandConfig.getRequiredRanks().containsKey(getName())) {
+            log.error("No rank required for command " + getName() + ". Command will not work.");
+            return;
+        }
+
+        if (!rankConfig.matchByName(commandConfig.getRequiredRanks().get(getName())).isPresent()) {
+            log.error("Invalid rank for command {0}: {1}. Command will not work.",
+                    getName(), commandConfig.getRequiredRanks().get(getName()));
+            return;
+        }
+
+        super.register();
     }
 
     @Override
@@ -55,19 +76,32 @@ public abstract class BaseCommand extends Command {
 
         if (sender instanceof Player) {
             val user = registry.get((Player) sender);
+            val rank = getRequiredRank();
             if (user == null || user.getRank().getWeight() < rank.getWeight()) {
-                throw new MissingPermissionException(rank.name());
+                throw new MissingPermissionException(rank.getName());
             }
         }
+    }
+
+    private Rank getRequiredRank() {
+        return rankConfig.matchByName(commandConfig.getRequiredRanks().get(getName()))
+                .orElseThrow(() -> new IllegalStateException("Illegal rank received for command " + getName()
+                        + ": " + commandConfig.getRequiredRanks().get(getName())));
     }
 
     protected void sendMessage(CommandSender sender, String message, Object... replacements) {
         sender.sendMessage(Chat.format(message, replacements));
     }
 
-    protected String nameOrCount(Set<Player> input) {
-        if (input.size() == 1) return registry.get(input.stream().findFirst().get()).getPrefixedName();
-        return input.size() + " players";
+    protected String nameOrCount(Set<? extends Entity> input) {
+        if (input.size() == 1) {
+            val first = input.stream().findFirst().get();
+            if (first instanceof Player) {
+                return registry.get((Player) first).getPrefixedName();
+            }
+        }
+
+        return input.size() + " " + (input.stream().allMatch(Player.class::isInstance) ? "players" : "entities");
     }
 
 }

@@ -42,7 +42,7 @@ public class NoPrefixedCommand implements IRegistrable {
     public void onCommand(PlayerCommandPreprocessEvent event) {
         val parts = event.getMessage().split(" ");
         if (parts[0].contains(":")) {
-            event.getPlayer().sendMessage(Chat.format(config.getNoPrefixing()));
+            event.getPlayer().sendMessage(Chat.format(config.getLocale().getNoPrefixing()));
             event.setCancelled(true);
         }
     }

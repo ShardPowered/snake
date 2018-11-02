@@ -25,50 +25,38 @@
 package me.tassu.snake.user.rank;
 
 import lombok.Getter;
-import lombok.val;
+import lombok.RequiredArgsConstructor;
 import me.tassu.snake.util.Chat;
+import ninja.leaping.configurate.objectmapping.Setting;
+import ninja.leaping.configurate.objectmapping.serialize.ConfigSerializable;
 import org.bukkit.ChatColor;
 
 @Getter
-public enum Rank {
+@ConfigSerializable
+@RequiredArgsConstructor
+public class Rank {
 
-    MEMBER(ChatColor.GRAY),
-    MODERATOR(ChatColor.BLUE, ChatColor.AQUA),
-    ADMIN(ChatColor.DARK_RED, ChatColor.RED),
-    ;
+    @Setting
+    private final String name;
 
-    private int weight;
-    private ChatColor primary;
-    private ChatColor secondary;
+    @Setting
+    private final int weight;
 
-    Rank(ChatColor color) {
-        this(color, color);
-    }
+    @Setting
+    private final ChatColor primary;
 
-    Rank(ChatColor primary, ChatColor secondary) {
-        this.weight = ordinal();
-        this.primary = primary;
-        this.secondary = secondary;
-    }
+    @Setting
+    private final ChatColor secondary;
 
-    /**
-     * Gets a rank by its name, defaults to {@link Rank#MEMBER} if none match
-     */
-    public static Rank byName(String name) {
-        if (name == null) return Rank.MEMBER;
-
-        for (val rank : values()) {
-            if (rank.name().equals(name.toUpperCase())) {
-                return rank;
-            }
-        }
-
-        return Rank.MEMBER;
-    }
+    private boolean isDefault;
 
     public String getTag() {
-        if (this == MEMBER) return Chat.GRAY;
-        return primary.toString() + "[" + name() + "] " + secondary.toString();
+        if (isDefault()) return Chat.GRAY;
+        return primary.toString() + "[" + getName() + "] " + secondary.toString();
     }
 
+    Rank setDefault() {
+        this.isDefault = true;
+        return this;
+    }
 }

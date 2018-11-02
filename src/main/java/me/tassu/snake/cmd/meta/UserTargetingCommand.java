@@ -24,10 +24,12 @@
 
 package me.tassu.snake.cmd.meta;
 
+import com.google.common.collect.Lists;
 import com.google.inject.Inject;
 import lombok.val;
+import me.tassu.easy.register.command.error.CommandException;
+import me.tassu.snake.cmd.meta.ex.UsageException;
 import me.tassu.snake.user.UserParser;
-import me.tassu.snake.user.rank.Rank;
 import me.tassu.util.ArrayUtil;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -37,8 +39,15 @@ import java.util.Set;
 
 public abstract class UserTargetingCommand extends BaseCommand {
 
-    private boolean useArguments;
-    private int requireArguments;
+    private boolean defaultToSelf = false;
+    private boolean useArguments = false;
+    private int requireArguments = 0;
+
+    @SuppressWarnings("WeakerAccess")
+    public UserTargetingCommand defaultToSelf() {
+        this.defaultToSelf = true;
+        return this;
+    }
 
     @SuppressWarnings("WeakerAccess")
     public UserTargetingCommand useArguments() {
@@ -68,40 +77,58 @@ public abstract class UserTargetingCommand extends BaseCommand {
     @Inject
     private CommandConfig config;
 
-    public UserTargetingCommand(String name, Rank rank) {
-        super(name, rank);
+    public UserTargetingCommand(String name) {
+        super(name);
     }
 
     @Override
-    public final void run(CommandSender sender, String label, List<String> args) {
+    public final void run(CommandSender sender, String label, List<String> args) throws CommandException {
         if (args.isEmpty()) {
-            sendMessage(sender, config.getUsageMessage(), getUsage());
-            return;
+            if (!useArguments && sender instanceof Player) {
+                args = Lists.newArrayList(sender.getName());
+            } else {
+                sendMessage(sender, config.getLocale().getUsageMessage(), getUsage());
+                return;
+            }
         }
 
         if (useArguments) {
             arguments = ArrayUtil.withoutFirst(args);
 
             if (arguments.size() < requireArguments) {
-                arguments = null;
-                sendMessage(sender, config.getUsageMessage(), getUsage());
-                return;
+                if (arguments.size() + 1 >= requireArguments && defaultToSelf && sender instanceof Player) {
+                    arguments = args;
+                    args = Lists.newArrayList(sender.getName());
+                } else {
+                    arguments = null;
+                    sendMessage(sender, config.getLocale().getUsageMessage(), getUsage());
+                    return;
+                }
             }
         }
 
         try {
             val target = parser.select(args.get(0), sender instanceof Player ? ((Player) sender) : null);
-            target.forEach(this::run);
+
+            try {
+                for (Player player : target) {
+                    run(player);
+                }
+            } catch (UsageException e) {
+                sendMessage(sender, config.getLocale().getUsageMessage(), getUsage());
+                return;
+            }
+
             sendSuccessMessage(sender, target);
         } finally {
             arguments = null;
         }
     }
 
-    public abstract void run(Player player);
+    public abstract void run(Player player) throws CommandException;
 
     protected void sendSuccessMessage(CommandSender sender, Set<Player> target) {
-        sendMessage(sender, config.getEntityAffectSuccess(), target.size());
+        sendMessage(sender, config.getLocale().getEntityAffectSuccess(), nameOrCount(target));
     }
 
 }

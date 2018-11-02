@@ -25,25 +25,57 @@
 package me.tassu.snake.cmd.staff;
 
 import com.google.inject.Singleton;
+import lombok.val;
 import me.tassu.easy.register.command.Aliases;
+import me.tassu.easy.register.command.error.CommandException;
 import me.tassu.snake.cmd.meta.UserTargetingCommand;
+import me.tassu.snake.cmd.meta.ex.UsageException;
+import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
 
 @Singleton
-@Aliases({"feed", "eat"})
-public class FeedCommand extends UserTargetingCommand {
+@Aliases({"gamemode", "gm"})
+public class GameModeCommand extends UserTargetingCommand {
 
-    public FeedCommand() {
-        super("feed");
+    public GameModeCommand() {
+        super("gamemode");
         this.defaultToSelf();
-        this.setUsage("/feed [users=self]");
-        this.setDescription("Used to feed a player.");
+        this.requireArguments(1);
+        this.setUsage("/gamemode [users=self] <mode>");
     }
 
     @Override
-    public void run(Player player) {
-        player.setFoodLevel(20);
-        player.setSaturation(20);
+    public void run(Player player) throws CommandException {
+        val mode = byName(getArguments().get(0));
+
+        if (mode == null) {
+            throw new UsageException();
+        }
+
+        player.setGameMode(mode);
+    }
+
+    public GameMode byName(String name) {
+        switch (name.toLowerCase().trim()) {
+            case "c":
+            case "creative":
+            case "1":
+                return GameMode.CREATIVE;
+            case "s":
+            case "survival":
+            case "0":
+                return GameMode.SURVIVAL;
+            case "a":
+            case "adventure":
+            case "2":
+                return GameMode.ADVENTURE;
+            case "sp":
+            case "spectator":
+            case "3":
+                return GameMode.SPECTATOR;
+            default:
+                return null;
+        }
     }
 
 }

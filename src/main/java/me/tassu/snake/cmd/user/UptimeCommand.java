@@ -31,7 +31,6 @@ import me.tassu.easy.register.command.Aliases;
 import me.tassu.easy.util.TimeUtil;
 import me.tassu.snake.cmd.meta.BaseCommand;
 import me.tassu.snake.cmd.meta.CommandConfig;
-import me.tassu.snake.user.rank.Rank;
 import org.bukkit.command.CommandSender;
 
 import java.util.List;
@@ -46,13 +45,13 @@ public class UptimeCommand extends BaseCommand {
     private final long started = System.currentTimeMillis();
 
     public UptimeCommand() {
-        super("uptime", Rank.MEMBER);
+        super("uptime");
         this.setDescription("Views the uptime of this server.");
     }
 
     @Override
     protected void run(CommandSender sender, String label, List<String> args) {
         val seconds = (System.currentTimeMillis() - started) / 1000;
-        sendMessage(sender, config.getUptimeMessage(), TimeUtil.format(seconds, 0));
+        sendMessage(sender, config.getLocale().getUptimeMessage(), TimeUtil.format(seconds, 0));
     }
 }

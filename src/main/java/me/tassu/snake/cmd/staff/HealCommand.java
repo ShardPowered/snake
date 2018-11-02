@@ -27,7 +27,6 @@ package me.tassu.snake.cmd.staff;
 import com.google.inject.Singleton;
 import me.tassu.easy.register.command.Aliases;
 import me.tassu.snake.cmd.meta.UserTargetingCommand;
-import me.tassu.snake.user.rank.Rank;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Player;
 
@@ -36,8 +35,9 @@ import org.bukkit.entity.Player;
 public class HealCommand extends UserTargetingCommand {
 
     public HealCommand() {
-        super("heal", Rank.MODERATOR);
-        this.setUsage("/heal <users>");
+        super("heal");
+        this.defaultToSelf();
+        this.setUsage("/heal [users=self]");
         this.setDescription("Used to heal a player.");
     }
 

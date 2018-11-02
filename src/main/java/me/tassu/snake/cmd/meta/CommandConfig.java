@@ -24,35 +24,57 @@
 
 package me.tassu.snake.cmd.meta;
 
+import com.google.common.collect.ImmutableMap;
 import com.google.inject.Singleton;
 import lombok.Getter;
 import me.tassu.easy.register.config.Config;
 import me.tassu.snake.util.Chat;
 import ninja.leaping.configurate.objectmapping.Setting;
+import ninja.leaping.configurate.objectmapping.serialize.ConfigSerializable;
+
+import java.util.Map;
 
 @Getter
 @Singleton
 @Config.Name("commands")
 public class CommandConfig extends Config<CommandConfig> {
 
-    private String prefix = Chat.prefix("Command");
+    @Setting
+    private Locale locale = new Locale();
 
-    @Setting("permission")
-    private String permissionMessage = prefix + "This command requires permission level " + Chat.BLUE + "{0}" + Chat.GRAY + "!";
+    @Getter
+    @ConfigSerializable
+    @SuppressWarnings("WeakerAccess")
+    public static class Locale {
+        private String prefix = Chat.prefix("Command");
 
-    @Setting("usage")
-    private String usageMessage = prefix + "Usage: " + Chat.WHITE + "{0}";
+        @Setting("permission")
+        private String permissionMessage = Chat.prefix(Chat.RED, "Command") + "Missing permissions.";
 
-    @Setting("rank-set")
-    private String setRankMessage = prefix + "Set rank of " + Chat.BLUE + "{0}" + Chat.GRAY + " to " + Chat.WHITE + "{1}" + Chat.GRAY + ".";
+        @Setting("usage")
+        private String usageMessage = prefix + "Usage: " + Chat.WHITE + "{0}";
 
-    @Setting("general-affected")
-    private String entityAffectSuccess = prefix + "Affected " + Chat.WHITE + "{0}" + Chat.GRAY + " entities.";
+        @Setting("rank-set")
+        private String setRankMessage = prefix + "Set rank of " + Chat.BLUE + "{0}" + Chat.GRAY + " to " + Chat.WHITE + "{1}" + Chat.GRAY + ".";
 
-    @Setting(value = "prefixed-command", comment = "Error message when a prefixed command (\"plugin:command\") is used.")
-    private String noPrefixing = Chat.prefix(Chat.RED, "Command") + "Please do not use prefixed commands.";
+        @Setting("general-affected")
+        private String entityAffectSuccess = prefix + "Affected " + Chat.WHITE + "{0}" + Chat.GRAY + ".";
 
-    @Setting("uptime")
-    private String uptimeMessage = prefix + "The server has been up for " + Chat.WHITE + "{0}" + Chat.GRAY + ".";
+        @Setting(value = "prefixed-command", comment = "Error message when a prefixed command (\"plugin:command\") is used.")
+        private String noPrefixing = Chat.prefix(Chat.RED, "Command") + "Please do not use prefixed commands.";
+
+        @Setting("uptime")
+        private String uptimeMessage = prefix + "The server has been up for " + Chat.WHITE + "{0}" + Chat.GRAY + ".";
+    }
+
+    @Setting("permissions")
+    private Map<String, String> requiredRanks = ImmutableMap.<String, String>builder()
+            .put("help", "MEMBER")
+            .put("uptime", "MEMBER")
+            .put("setrank", "ADMIN")
+            .put("gamemode", "ADMIN")
+            .put("heal", "MODERATOR")
+            .put("feed", "MODERATOR")
+            .build();
 
 }

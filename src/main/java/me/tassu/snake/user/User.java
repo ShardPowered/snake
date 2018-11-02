@@ -30,6 +30,7 @@ import lombok.Getter;
 import lombok.val;
 import me.tassu.snake.user.level.LevelUtil;
 import me.tassu.snake.user.rank.Rank;
+import me.tassu.snake.user.rank.RankConfig;
 import org.bson.Document;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -65,11 +66,11 @@ public class User {
         return LevelUtil.getProgress(totalExperience, getLevel());
     }
 
-    User(UUID uuid, Document document) {
+    User(UUID uuid, Document document, RankConfig config) {
         Preconditions.checkNotNull(uuid);
 
         this.uuid = uuid;
-        this.rank = Rank.byName(document.getString(UserKey.RANK));
+        this.rank = config.byName(document.getString(UserKey.RANK));
 
         val firstJoin = document.getLong(UserKey.FIRST_JOIN);
         this.firstJoin = firstJoin == null ? System.currentTimeMillis() : firstJoin;
@@ -103,7 +104,7 @@ public class User {
         this.rank = rank;
         updateTag();
 
-        addToSaveQueue(UserKey.RANK, rank.name());
+        addToSaveQueue(UserKey.RANK, rank.getName());
     }
 
     public void updateTag() {

@@ -35,6 +35,7 @@ import me.tassu.easy.register.core.IRegistrable;
 import me.tassu.simple.TaskChainModule;
 import me.tassu.snake.cmd.meta.CommandConfig;
 import me.tassu.snake.db.MongoManager;
+import me.tassu.snake.user.rank.RankConfig;
 import me.tassu.snake.util.Chat;
 import org.bson.Document;
 import org.bukkit.Bukkit;
@@ -55,6 +56,9 @@ import static com.mongodb.client.model.Filters.eq;
 public class UserRegistry implements IRegistrable {
 
     private static final UpdateOptions SAVE_OPTIONS = new UpdateOptions().upsert(true);
+
+    @Inject
+    private RankConfig config;
 
     @Inject
     private TaskChainModule chain;
@@ -86,7 +90,7 @@ public class UserRegistry implements IRegistrable {
                 document = new Document();
             }
 
-            users.put(uuid, new User(uuid, document));
+            users.put(uuid, new User(uuid, document, config));
         }
 
         return users.get(uuid);

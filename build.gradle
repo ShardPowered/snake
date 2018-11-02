@@ -48,6 +48,7 @@ dependencies {
 
     compile "me.tassu.util:core:1.0.01"
     compile 'org.mongodb:mongodb-driver-sync:3.8.2'
+    compile "io.papermc:paperlib:1.0.1"
 }
 
 processResources {
@@ -67,6 +68,8 @@ shadowJar {
     relocate 'com.google', 'me.tassu.easy.google'
     relocate 'com.typesafe.config', 'me.tassu.easy.lib.typesafe'
     relocate 'co.aikar', 'me.tassu.easy.lib.aikar'
+
+    relocate 'io.papermc.lib', 'me.tassu.snake.lib.paper'
 }
 
 jar {

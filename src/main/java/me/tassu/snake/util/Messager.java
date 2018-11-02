@@ -35,6 +35,6 @@ public class Messager extends SimpleMessageProvider {
 
     @Override
     public void sendMissingPermissionMessage(CommandSender sender, String permission) {
-        sender.sendMessage(Chat.format(commandConfig.getPermissionMessage(), permission));
+        sender.sendMessage(Chat.format(commandConfig.getLocale().getPermissionMessage()));
     }
 }

@@ -22,27 +22,8 @@
  * SOFTWARE.
  */
 
-package me.tassu.snake.cmd.user;
+package me.tassu.snake.cmd.meta.ex;
 
-import com.google.inject.Singleton;
-import me.tassu.easy.register.command.Aliases;
-import me.tassu.snake.cmd.meta.BaseCommand;
-import me.tassu.snake.util.Chat;
-import org.bukkit.command.CommandSender;
+import me.tassu.easy.register.command.error.CommandException;
 
-import java.util.List;
-
-@Singleton
-@Aliases({"help", "commands", "?"})
-public class HelpCommand extends BaseCommand {
-
-    public HelpCommand() {
-        super("help");
-        this.setUsage("/help");
-    }
-
-    @Override
-    protected void run(CommandSender sender, String label, List<String> args) {
-        sender.sendMessage(Chat.prefix("Help") + "Coming soon.");
-    }
-}
+public class UsageException extends CommandException {}

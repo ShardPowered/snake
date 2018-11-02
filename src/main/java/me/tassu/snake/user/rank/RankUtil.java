@@ -36,10 +36,11 @@ import java.util.function.Predicate;
 @Singleton
 public class RankUtil implements IRegistrable {
 
+    @Inject private RankConfig config;
     @Inject private UserRegistry registry;
 
     public Predicate<Player> predicate(String rankIn) {
-        val rank = Rank.byName(rankIn);
+        val rank = config.byName(rankIn);
         return player -> registry.get(player.getUniqueId()).getRank().getWeight() >= rank.getWeight();
     }
 }
