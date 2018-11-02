@@ -31,11 +31,15 @@ import me.tassu.easy.register.command.Aliases;
 import me.tassu.snake.cmd.meta.CommandConfig;
 import me.tassu.snake.cmd.meta.UserTargetingCommand;
 import me.tassu.snake.user.UserRegistry;
+import me.tassu.snake.user.rank.Rank;
 import me.tassu.snake.user.rank.RankConfig;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.util.StringUtil;
 
+import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Singleton
 @Aliases({"setrank"})
@@ -68,5 +72,18 @@ public class SetRankCommand extends UserTargetingCommand {
     protected void sendSuccessMessage(CommandSender sender, Set<Player> target) {
         val rank = rankConfig.byName(getArguments().get(0));
         sendMessage(sender, config.getLocale().getSetRankMessage(), nameOrCount(target), rank.getName());
+    }
+
+    @Override
+    public List<String> tabComplete(CommandSender sender, String alias, String[] args) throws IllegalArgumentException {
+        if (args.length == 2) {
+            return rankConfig.getRanks().stream()
+                    .filter(rank -> StringUtil.startsWithIgnoreCase(rank.getName(), args[1]))
+                    .map(Rank::getName)
+                    .sorted(String.CASE_INSENSITIVE_ORDER)
+                    .collect(Collectors.toList());
+        }
+
+        return super.tabComplete(sender, alias, args);
     }
 }

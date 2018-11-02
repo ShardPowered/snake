@@ -24,6 +24,7 @@
 
 package me.tassu.snake.cmd.meta;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.google.inject.Inject;
 import lombok.val;
@@ -31,11 +32,17 @@ import me.tassu.easy.register.command.error.CommandException;
 import me.tassu.snake.cmd.meta.ex.UsageException;
 import me.tassu.snake.user.UserParser;
 import me.tassu.util.ArrayUtil;
+import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.util.StringUtil;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 public abstract class UserTargetingCommand extends BaseCommand {
 
@@ -131,4 +138,30 @@ public abstract class UserTargetingCommand extends BaseCommand {
         sendMessage(sender, config.getLocale().getEntityAffectSuccess(), nameOrCount(target));
     }
 
+    @Override
+    public List<String> tabComplete(CommandSender sender, String alias, String[] args) throws IllegalArgumentException {
+        if (args.length == 0) {
+            return ImmutableList.of();
+        }
+
+        if (args.length == 1) {
+            Predicate<Player> canSee = sender instanceof Player
+                    ? ((Player) sender)::canSee
+                    : player -> true;
+
+            return sender.getServer().getOnlinePlayers().stream()
+                    .filter(canSee)
+                    .filter(player -> StringUtil.startsWithIgnoreCase(player.getName(), args[0]))
+                    .map(Player::getName)
+                    .sorted(String.CASE_INSENSITIVE_ORDER)
+                    .collect(Collectors.toList());
+        }
+
+        return ImmutableList.of();
+    }
+
+    @Override
+    public final List<String> tabComplete(CommandSender sender, String alias, String[] args, Location location) throws IllegalArgumentException {
+        return tabComplete(sender, alias, args);
+    }
 }

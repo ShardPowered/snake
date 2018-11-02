@@ -99,6 +99,8 @@ public abstract class BaseCommand extends Command {
             if (first instanceof Player) {
                 return registry.get((Player) first).getPrefixedName();
             }
+
+            return first.isCustomNameVisible() ? first.getCustomName() : first.getName();
         }
 
         return input.size() + " " + (input.stream().allMatch(Player.class::isInstance) ? "players" : "entities");

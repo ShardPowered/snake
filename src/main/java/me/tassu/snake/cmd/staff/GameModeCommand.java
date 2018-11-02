@@ -30,8 +30,15 @@ import me.tassu.easy.register.command.Aliases;
 import me.tassu.easy.register.command.error.CommandException;
 import me.tassu.snake.cmd.meta.UserTargetingCommand;
 import me.tassu.snake.cmd.meta.ex.UsageException;
+import me.tassu.snake.user.rank.Rank;
 import org.bukkit.GameMode;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.util.StringUtil;
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Singleton
 @Aliases({"gamemode", "gm"})
@@ -55,7 +62,7 @@ public class GameModeCommand extends UserTargetingCommand {
         player.setGameMode(mode);
     }
 
-    public GameMode byName(String name) {
+    private GameMode byName(String name) {
         switch (name.toLowerCase().trim()) {
             case "c":
             case "creative":
@@ -78,4 +85,15 @@ public class GameModeCommand extends UserTargetingCommand {
         }
     }
 
+    @Override
+    public List<String> tabComplete(CommandSender sender, String alias, String[] args) throws IllegalArgumentException {
+        if (args.length == 2) {
+            return Arrays.stream(new String[]{ "creative", "survival", "adventure", "spectator", "0", "1", "2", "3" })
+                    .filter(mode -> StringUtil.startsWithIgnoreCase(mode, args[1]))
+                    .sorted(String.CASE_INSENSITIVE_ORDER)
+                    .collect(Collectors.toList());
+        }
+
+        return super.tabComplete(sender, alias, args);
+    }
 }
