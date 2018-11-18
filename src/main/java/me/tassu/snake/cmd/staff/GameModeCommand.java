@@ -24,10 +24,13 @@
 
 package me.tassu.snake.cmd.staff;
 
+import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.val;
 import me.tassu.easy.register.command.Aliases;
 import me.tassu.easy.register.command.error.CommandException;
+import me.tassu.snake.cmd.meta.CommandConfig;
+import me.tassu.snake.cmd.meta.Message;
 import me.tassu.snake.cmd.meta.UserTargetingCommand;
 import me.tassu.snake.cmd.meta.ex.UsageException;
 import me.tassu.snake.user.rank.Rank;
@@ -38,11 +41,16 @@ import org.bukkit.util.StringUtil;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Singleton
 @Aliases({"gamemode", "gm"})
 public class GameModeCommand extends UserTargetingCommand {
+
+    @Inject
+    private CommandConfig config;
 
     public GameModeCommand() {
         super("gamemode");
@@ -60,6 +68,16 @@ public class GameModeCommand extends UserTargetingCommand {
         }
 
         player.setGameMode(mode);
+    }
+
+    @Override
+    protected Message getMessage() {
+        return config.getLocale().getGamemodeSetMessage();
+    }
+
+    @Override
+    protected Object[] getPlaceholders(Set<Player> target) {
+        return new Object[] {nameOrCount(target), Objects.requireNonNull(byName(getArguments().get(0))).name()};
     }
 
     private GameMode byName(String name) {

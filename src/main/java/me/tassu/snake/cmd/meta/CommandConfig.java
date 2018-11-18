@@ -66,6 +66,10 @@ public class CommandConfig extends Config<CommandConfig> {
 
         // admin commands
 
+        @Setting("gamemode-set")
+        private Message gamemodeSetMessage = of(prefix,
+                "Set game mode of " + Chat.BLUE + "{0}" + Chat.GRAY + " to " + Chat.WHITE + "{1}" + Chat.GRAY + ".");
+
         @Setting("rank-set")
         private Message setRankMessage = of(prefix,
                 "Set rank of " + Chat.BLUE + "{0}" + Chat.GRAY + " to " + Chat.WHITE + "{1}" + Chat.GRAY + ".");
