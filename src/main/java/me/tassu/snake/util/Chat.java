@@ -25,11 +25,15 @@
 package me.tassu.snake.util;
 
 import com.google.common.collect.Lists;
+import org.apache.commons.lang.StringUtils;
 import org.bukkit.ChatColor;
 
 import java.text.MessageFormat;
 import java.util.List;
 
+/**
+ * https://github.com/Minespree/Wizard/blob/master/src/main/java/net/minespree/wizard/util/Chat.java
+ */
 @SuppressWarnings("WeakerAccess")
 public class Chat {
 
@@ -73,6 +77,7 @@ public class Chat {
     public static final String BIG_HORIZONTAL_LINE = "▍";
     public static final String SMALL_HORIZONTAL_LINE = "▏";
 
+    public static final int CHAT_WIDTH = 320; // px
 
     public static String prefix(String title) {
         return prefix(BLUE, title);
@@ -85,4 +90,46 @@ public class Chat {
     public static String format(String input, Object... replacements) {
         return ChatColor.translateAlternateColorCodes('&', MessageFormat.format(input, replacements));
     }
+
+    public static String center(String text) {
+        return center(text, ' ');
+    }
+
+    public static String center(String text, char pad) {
+        int length = getStringWidth(text);
+        int padding = ((CHAT_WIDTH - length) / (DefaultFontInfo.getDefaultFontInfo(pad).getLength() + 1)) / 2;
+
+        if (padding <= 0) {
+            return text;
+        } else {
+            text += RESET; // Make sure to reset bold after the String
+            return StringUtils.leftPad(text, text.length() + padding, ' ');
+        }
+    }
+
+    private static int getStringWidth(String text) {
+        int length = 0;
+        boolean nextIsColour = false;
+        boolean bold = false;
+        int chars = 0;
+        for (char c : text.toCharArray()) {
+            if (c == ChatColor.COLOR_CHAR) {
+                nextIsColour = true;
+            } else if (nextIsColour) {
+                ChatColor cc = ChatColor.getByChar(c);
+                if (cc == ChatColor.BOLD) {
+                    bold = true;
+                } else if (cc == ChatColor.RESET) {
+                    bold = false;
+                }
+                nextIsColour = false;
+            } else {
+                DefaultFontInfo dfi = DefaultFontInfo.getDefaultFontInfo(c);
+                length += bold ? dfi.getBoldLength() : dfi.getLength();
+                chars++;
+            }
+        }
+        return length + chars;
+    }
+
 }
