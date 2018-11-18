@@ -28,6 +28,7 @@ import com.google.common.base.Preconditions;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.val;
+import me.tassu.snake.api.event.PostUserExperienceGainEvent;
 import me.tassu.snake.user.level.LevelUtil;
 import me.tassu.snake.user.rank.Rank;
 import me.tassu.snake.user.rank.RankConfig;
@@ -55,7 +56,7 @@ public class User {
     private Rank rank;
     private long firstJoin;
     private long totalExperience;
-    private String lastNickname;
+    private String userName;
 
     @SuppressWarnings("WeakerAccess")
     public int getLevel() {
@@ -79,7 +80,7 @@ public class User {
         this.totalExperience = experience == null ? 0 : experience;
 
         val nickname = document.getString(UserKey.NICKNAME);
-        this.lastNickname = nickname == null ? "Steve" : nickname;
+        this.userName = nickname == null ? "Steve" : nickname;
 
         addToSaveQueue(UserKey.UUID, uuid.toString());
 
@@ -90,12 +91,14 @@ public class User {
         // TODO check levelup and add rewards
         this.totalExperience += experience;
         addToSaveQueue(UserKey.EXPERIENCE, totalExperience);
+
+        Bukkit.getPluginManager().callEvent(new PostUserExperienceGainEvent(this));
     }
 
     public void setNickname(String nickname) {
-        if (lastNickname.equals(nickname)) return;
+        if (userName.equals(nickname)) return;
 
-        this.lastNickname = nickname;
+        this.userName = nickname;
         addToSaveQueue(UserKey.NICKNAME, nickname);
     }
 
@@ -127,6 +130,6 @@ public class User {
     }
 
     public String getPrefixedName() {
-        return getRank().getTag() + getLastNickname();
+        return getRank().getTag() + getUserName();
     }
 }

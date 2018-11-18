@@ -22,15 +22,19 @@
  * SOFTWARE.
  */
 
-package me.tassu.snake.user;
+package me.tassu.snake.api.event;
 
-public class UserKey {
+import lombok.Getter;
+import me.tassu.snake.user.User;
+import org.bukkit.event.Event;
 
-    public static final String COLLECTION = "users";
+public abstract class BaseUserEvent extends Event {
 
-    public static final String UUID = "_id";
-    public static final String RANK = "rank";
-    public static final String EXPERIENCE = "exp";
-    public static final String FIRST_JOIN = "first_join";
-    public static final String NICKNAME = "last_known_name";
+    public BaseUserEvent(User user) {
+        this.user = user;
+    }
+
+    @Getter
+    private User user;
+
 }

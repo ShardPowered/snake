@@ -22,15 +22,26 @@
  * SOFTWARE.
  */
 
-package me.tassu.snake.user;
+package me.tassu.snake.api.event;
 
-public class UserKey {
+import me.tassu.snake.user.User;
+import org.bukkit.event.Event;
+import org.bukkit.event.HandlerList;
 
-    public static final String COLLECTION = "users";
+public class PostUserExperienceGainEvent extends BaseUserEvent {
 
-    public static final String UUID = "_id";
-    public static final String RANK = "rank";
-    public static final String EXPERIENCE = "exp";
-    public static final String FIRST_JOIN = "first_join";
-    public static final String NICKNAME = "last_known_name";
+    public PostUserExperienceGainEvent(User user) {
+        super(user);
+    }
+
+    private static final HandlerList handlers = new HandlerList();
+
+    @Override
+    public HandlerList getHandlers() {
+        return handlers;
+    }
+
+    public static HandlerList getHandlerList() {
+        return handlers;
+    }
 }

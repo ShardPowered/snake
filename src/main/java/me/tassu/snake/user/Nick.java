@@ -24,13 +24,15 @@
 
 package me.tassu.snake.user;
 
-public class UserKey {
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
+import me.tassu.snake.user.rank.Rank;
 
-    public static final String COLLECTION = "users";
+// todo
+@AllArgsConstructor
+public class Nick {
 
-    public static final String UUID = "_id";
-    public static final String RANK = "rank";
-    public static final String EXPERIENCE = "exp";
-    public static final String FIRST_JOIN = "first_join";
-    public static final String NICKNAME = "last_known_name";
+    private String name;
+    private Rank rank;
+
 }

@@ -50,7 +50,7 @@ public class RankConfig extends Config<RankConfig> {
 
     @Setting
     private List<Rank> ranks = Lists.newArrayList(
-            new Rank("MEMBER", 0, ChatColor.GRAY, ChatColor.GRAY).setDefault(),
+            new Rank("MEMBER", 0, ChatColor.GRAY, ChatColor.GRAY).setDefault().setNickname("Member"),
             new Rank("MODERATOR", 25, ChatColor.DARK_GREEN, ChatColor.GREEN).setNickname("Mod"),
             new Rank("ADMIN", 150, ChatColor.DARK_RED, ChatColor.RED).setNickname("Admin")
     );
