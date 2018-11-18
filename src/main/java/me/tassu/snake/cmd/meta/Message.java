@@ -31,6 +31,7 @@ import ninja.leaping.configurate.objectmapping.Setting;
 import ninja.leaping.configurate.objectmapping.serialize.ConfigSerializable;
 
 @NoArgsConstructor
+@AllArgsConstructor
 @ConfigSerializable
 public class Message {
 
@@ -39,7 +40,8 @@ public class Message {
             throw new IllegalArgumentException("too short message");
         }
 
-        return of(prefix + message, prefix + Chat.WHITE + "{ACTOR} " + Chat.GRAY + Character.toLowerCase(message.charAt(0)) + message.substring(1));
+        return new Message(prefix + message, prefix + Chat.WHITE + "{ACTOR} "
+                + Chat.GRAY + Character.toLowerCase(message.charAt(0)) + message.substring(1));
     }
 
     @Setting

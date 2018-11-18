@@ -161,7 +161,7 @@ public abstract class UserTargetingCommand extends BaseCommand {
 
         Bukkit.getOnlinePlayers().stream()
                 .filter(it -> it != sender)
-                .filter(it -> registry.get(it).getRank().getWeight() > getRequiredRank().getWeight())
+                .filter(it -> registry.get(it).getRank().getWeight() >= getRequiredRank().getWeight())
                 .forEach(it -> sendMessage(it, getMessage().getOthers(actor), getPlaceholders(target)));
     }
 
