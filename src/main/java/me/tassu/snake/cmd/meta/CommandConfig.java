@@ -34,6 +34,8 @@ import ninja.leaping.configurate.objectmapping.serialize.ConfigSerializable;
 
 import java.util.Map;
 
+import static me.tassu.snake.cmd.meta.Message.of;
+
 @Getter
 @Singleton
 @Config.Name("commands")
@@ -54,17 +56,22 @@ public class CommandConfig extends Config<CommandConfig> {
         @Setting("usage")
         private String usageMessage = prefix + "Usage: " + Chat.WHITE + "{0}";
 
-        @Setting("rank-set")
-        private String setRankMessage = prefix + "Set rank of " + Chat.BLUE + "{0}" + Chat.GRAY + " to " + Chat.WHITE + "{1}" + Chat.GRAY + ".";
-
-        @Setting("general-affected")
-        private String entityAffectSuccess = prefix + "Affected " + Chat.WHITE + "{0}" + Chat.GRAY + ".";
-
         @Setting(value = "prefixed-command", comment = "Error message when a prefixed command (\"plugin:command\") is used.")
         private String noPrefixing = Chat.prefix(Chat.RED, "Command") + "Please do not use prefixed commands.";
 
+        // informal commands
+
         @Setting("uptime")
         private String uptimeMessage = prefix + "The server has been up for " + Chat.WHITE + "{0}" + Chat.GRAY + ".";
+
+        // admin commands
+
+        @Setting("rank-set")
+        private Message setRankMessage = of(prefix,
+                "Set rank of " + Chat.BLUE + "{0}" + Chat.GRAY + " to " + Chat.WHITE + "{1}" + Chat.GRAY + ".");
+
+        @Setting("general-affected")
+        private Message entityAffectSuccess = of(prefix, "Affected " + Chat.WHITE + "{0}" + Chat.GRAY + ".");
     }
 
     @Setting("permissions")

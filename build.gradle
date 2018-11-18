@@ -9,6 +9,7 @@ buildscript {
 
 plugins {
     id 'java'
+    id 'maven-publish'
     id 'io.franzbecker.gradle-lombok' version '1.14'
     id 'com.github.johnrengelman.shadow' version '2.0.4'
     id 'net.minecrell.licenser' version '0.4.1'
@@ -44,7 +45,7 @@ repositories {
 
 dependencies {
     compileOnly 'com.destroystokyo.paper:paper-api:1.13.1-R0.1-SNAPSHOT'
-    compileOnly "me.tassu:easy:1.0.0"
+    compileOnly "me.tassu:easy:1.0.1+"
 
     compile "me.tassu.util:core:1.0.01"
     compile 'org.mongodb:mongodb-driver-sync:3.8.2'
@@ -80,4 +81,31 @@ license {
     header = project.file('LICENSE')
     include '**/*.java'
     newLine = true
+}
+
+task sourcesJar(type: Jar) {
+    from sourceSets.main.allJava
+    classifier = 'sources'
+}
+
+task javadocJar(type: Jar) {
+    from javadoc
+    classifier = 'javadoc'
+}
+
+publishing {
+    publications {
+        maven(MavenPublication) {
+            artifactId = 'snake'
+
+            artifact sourcesJar
+            artifact javadocJar
+
+            from components.java
+        }
+    }
+
+    repositories {
+        maven { url "file:///home/tassu/maven" }
+    }
 }

@@ -83,7 +83,7 @@ public abstract class BaseCommand extends Command {
         }
     }
 
-    private Rank getRequiredRank() {
+    protected Rank getRequiredRank() {
         return rankConfig.matchByName(commandConfig.getRequiredRanks().get(getName()))
                 .orElseThrow(() -> new IllegalStateException("Illegal rank received for command " + getName()
                         + ": " + commandConfig.getRequiredRanks().get(getName())));

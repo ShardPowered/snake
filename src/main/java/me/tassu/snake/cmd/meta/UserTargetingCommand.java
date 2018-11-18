@@ -31,9 +31,12 @@ import lombok.val;
 import me.tassu.easy.register.command.error.CommandException;
 import me.tassu.snake.cmd.meta.ex.UsageException;
 import me.tassu.snake.user.UserParser;
+import me.tassu.snake.user.UserRegistry;
 import me.tassu.util.ArrayUtil;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
+import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.util.StringUtil;
 
@@ -77,6 +80,9 @@ public abstract class UserTargetingCommand extends BaseCommand {
 
         return arguments;
     }
+
+    @Inject
+    private UserRegistry registry;
 
     @Inject
     private UserParser parser;
@@ -134,8 +140,29 @@ public abstract class UserTargetingCommand extends BaseCommand {
 
     public abstract void run(Player player) throws CommandException;
 
+    protected Message getMessage() {
+        return config.getLocale().getEntityAffectSuccess();
+    }
+
+    protected Object[] getPlaceholders(Set<Player> target) {
+        return new Object[] {nameOrCount(target)};
+    }
+
     protected void sendSuccessMessage(CommandSender sender, Set<Player> target) {
-        sendMessage(sender, config.getLocale().getEntityAffectSuccess(), nameOrCount(target));
+        sendMessage(sender, getMessage().getSelf(), getPlaceholders(target));
+
+        val actor = sender instanceof Player
+                ? registry.get((Player) sender).getPrefixedName()
+                : sender.getName();
+
+        if (!(sender instanceof ConsoleCommandSender)) {
+            sendMessage(Bukkit.getConsoleSender(), getMessage().getOthers(actor), getPlaceholders(target));
+        }
+
+        Bukkit.getOnlinePlayers().stream()
+                .filter(it -> it != sender)
+                .filter(it -> registry.get(it).getRank().getWeight() > getRequiredRank().getWeight())
+                .forEach(it -> sendMessage(it, getMessage().getOthers(actor), getPlaceholders(target)));
     }
 
     @Override

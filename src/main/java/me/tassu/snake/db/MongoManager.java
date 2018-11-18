@@ -51,7 +51,7 @@ import java.util.logging.Logger;
 @Singleton
 public class MongoManager implements IRegistrable {
 
-    public static final String KICK_MESSAGE = Chat.RED + Chat.BOLD + "MongoDB (database) failure";
+    public static final String KICK_MESSAGE = Chat.RED + "MongoDB (database) failure";
 
     private boolean connected = false;
 

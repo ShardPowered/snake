@@ -22,66 +22,34 @@
  * SOFTWARE.
  */
 
-package me.tassu.snake.user.rank;
+package me.tassu.snake.cmd.meta;
 
-import lombok.AccessLevel;
-import lombok.Getter;
+import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
-import lombok.RequiredArgsConstructor;
 import me.tassu.snake.util.Chat;
 import ninja.leaping.configurate.objectmapping.Setting;
 import ninja.leaping.configurate.objectmapping.serialize.ConfigSerializable;
-import org.bukkit.ChatColor;
 
-@Getter
 @NoArgsConstructor
 @ConfigSerializable
-public class Rank {
+public class Message {
 
-    @Setting
-    private String name;
+    public static Message of(String prefix, String message) {
+        if (message.length() < 2) {
+            throw new IllegalArgumentException("too short message");
+        }
 
-    @Setting
-    @Getter(AccessLevel.NONE)
-    private String nickname;
-
-    @Setting
-    private int weight;
-
-    @Setting
-    private ChatColor primary;
-
-    @Setting
-    private ChatColor secondary;
-
-    @Setting
-    private boolean isDefault = false;
-
-    public Rank(String name, int weight, ChatColor primary, ChatColor secondary) {
-        this.name = name;
-        this.weight = weight;
-        this.primary = primary;
-        this.secondary = secondary;
+        return of(prefix + message, prefix + Chat.WHITE + "{ACTOR} " + Chat.GRAY + Character.toLowerCase(message.charAt(0)) + message.substring(1));
     }
 
-    public String getTag() {
-        if (isDefault()) return Chat.GRAY;
-        return primary.toString() + "[" + getNickname() + "] " + secondary.toString();
+    @Setting
+    private String self, others;
+
+    public String getSelf() {
+        return self;
     }
 
-    public String getNickname() {
-        if (nickname == null) return getName();
-        return nickname;
+    public String getOthers(String actor) {
+        return others.replace("{ACTOR}", actor);
     }
-
-    Rank setDefault() {
-        this.isDefault = true;
-        return this;
-    }
-
-    Rank setNickname(String nickname) {
-        this.nickname = nickname;
-        return this;
-    }
-
 }

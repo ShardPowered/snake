@@ -29,6 +29,7 @@ import com.google.inject.Singleton;
 import lombok.val;
 import me.tassu.easy.register.command.Aliases;
 import me.tassu.snake.cmd.meta.CommandConfig;
+import me.tassu.snake.cmd.meta.Message;
 import me.tassu.snake.cmd.meta.UserTargetingCommand;
 import me.tassu.snake.user.UserRegistry;
 import me.tassu.snake.user.rank.Rank;
@@ -69,9 +70,13 @@ public class SetRankCommand extends UserTargetingCommand {
     }
 
     @Override
-    protected void sendSuccessMessage(CommandSender sender, Set<Player> target) {
-        val rank = rankConfig.byName(getArguments().get(0));
-        sendMessage(sender, config.getLocale().getSetRankMessage(), nameOrCount(target), rank.getName());
+    protected Object[] getPlaceholders(Set<Player> target) {
+        return new Object[] {nameOrCount(target), rankConfig.byName(getArguments().get(0)).getName()};
+    }
+
+    @Override
+    protected Message getMessage() {
+        return config.getLocale().getSetRankMessage();
     }
 
     @Override

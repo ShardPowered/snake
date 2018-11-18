@@ -31,6 +31,7 @@ import me.tassu.easy.api.binder.BindManager;
 import me.tassu.easy.api.message.IMessageProvider;
 import me.tassu.easy.log.Log;
 import me.tassu.simple.TaskChainModule;
+import me.tassu.snake.api.SnakeAPI;
 import me.tassu.snake.chat.ChatConfig;
 import me.tassu.snake.chat.ChatFormatter;
 import me.tassu.snake.cmd.meta.CommandConfig;
@@ -65,6 +66,8 @@ public final class SnakePlugin extends EasyPlugin {
             getServer().getPluginManager().disablePlugin(this);
             return;
         }
+
+        __unsafe__getInjector().injectMembers(new SnakeAPI(__unsafe__getInjector()));
 
         registerAll(
                 MongoConfig.class,
