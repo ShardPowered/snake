@@ -57,6 +57,9 @@ public class Rank {
     @Setting
     private boolean isDefault = false;
 
+    @Setting(comment = "SHOW_PREFIX | SHOW_COLOR | NONE")
+    private TablistMode tablistMode = TablistMode.SHOW_COLOR;
+
     public Rank(String name, int weight, ChatColor primary, ChatColor secondary) {
         this.name = name;
         this.weight = weight;
@@ -82,6 +85,12 @@ public class Rank {
     Rank setNickname(String nickname) {
         this.nickname = nickname;
         return this;
+    }
+
+    public enum TablistMode {
+        SHOW_PREFIX,
+        SHOW_COLOR,
+        NONE
     }
 
 }

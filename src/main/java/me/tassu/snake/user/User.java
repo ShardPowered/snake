@@ -112,8 +112,13 @@ public class User {
 
     public void updateTag() {
         this.getPlayer().ifPresent(player -> {
-            player.setPlayerListName(getPrefixedName());
-            player.setCustomName(getPrefixedName());
+            if (rank.getTablistMode() == Rank.TablistMode.SHOW_PREFIX) {
+                player.setPlayerListName(getPrefixedName());
+            } else if (rank.getTablistMode() == Rank.TablistMode.SHOW_COLOR) {
+                player.setPlayerListName(rank.getPrimary().toString() + getUserName());
+            } else {
+                player.setPlayerListName(null);
+            }
         });
     }
 
