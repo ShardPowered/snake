@@ -22,30 +22,32 @@
  * SOFTWARE.
  */
 
-package me.tassu.snake.cmd.meta;
+package me.tassu.snake.user.achievement;
 
-import com.google.common.collect.ImmutableMap;
+import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import lombok.Getter;
-import me.tassu.easy.register.config.Config;
-import ninja.leaping.configurate.objectmapping.Setting;
+import me.tassu.easy.register.core.IRegistrable;
+import me.tassu.simple.TaskChainModule;
+import me.tassu.snake.user.UserRegistry;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.player.PlayerJoinEvent;
 
-import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
-@Getter
 @Singleton
-@Config.Name("commands")
-public class CommandConfig extends Config<CommandConfig> {
+public class AchievementListener implements IRegistrable {
 
-    @Setting("permissions")
-    private Map<String, String> requiredRanks = ImmutableMap.<String, String>builder()
-            .put("help", "MEMBER")
-            .put("uptime", "MEMBER")
-            .put("setrank", "ADMIN")
-            .put("gamemode", "ADMIN")
-            .put("heal", "MODERATOR")
-            .put("feed", "MODERATOR")
-            .build();
+    @Inject
+    private UserRegistry userRegistry;
 
+    @Inject
+    private TaskChainModule taskChainModule;
 
+    @EventHandler(ignoreCancelled = true)
+    public void onPlayerJoin(PlayerJoinEvent event) {
+        taskChainModule.newChain()
+                .delay(2, TimeUnit.SECONDS)
+                .asyncFirst(() -> userRegistry.get(event.getPlayer()))
+                .syncLast(user -> user.addAchievement(Achievement.FIRST_JOIN)).execute();
+    }
 }

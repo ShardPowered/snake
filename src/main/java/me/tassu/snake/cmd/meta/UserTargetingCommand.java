@@ -32,6 +32,7 @@ import me.tassu.easy.register.command.error.CommandException;
 import me.tassu.snake.cmd.meta.ex.UsageException;
 import me.tassu.snake.user.UserParser;
 import me.tassu.snake.user.UserRegistry;
+import me.tassu.snake.util.LocaleConfig;
 import me.tassu.util.ArrayUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -40,8 +41,6 @@ import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.util.StringUtil;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Predicate;
@@ -88,7 +87,7 @@ public abstract class UserTargetingCommand extends BaseCommand {
     private UserParser parser;
 
     @Inject
-    private CommandConfig config;
+    private LocaleConfig locale;
 
     public UserTargetingCommand(String name) {
         super(name);
@@ -100,7 +99,7 @@ public abstract class UserTargetingCommand extends BaseCommand {
             if (!useArguments && sender instanceof Player) {
                 args = Lists.newArrayList(sender.getName());
             } else {
-                sendMessage(sender, config.getLocale().getUsageMessage(), getUsage());
+                sendMessage(sender, locale.getLocale().getUsageMessage(), getUsage());
                 return;
             }
         }
@@ -114,7 +113,7 @@ public abstract class UserTargetingCommand extends BaseCommand {
                     args = Lists.newArrayList(sender.getName());
                 } else {
                     arguments = null;
-                    sendMessage(sender, config.getLocale().getUsageMessage(), getUsage());
+                    sendMessage(sender, locale.getLocale().getUsageMessage(), getUsage());
                     return;
                 }
             }
@@ -128,7 +127,7 @@ public abstract class UserTargetingCommand extends BaseCommand {
                     run(player);
                 }
             } catch (UsageException e) {
-                sendMessage(sender, config.getLocale().getUsageMessage(), getUsage());
+                sendMessage(sender, locale.getLocale().getUsageMessage(), getUsage());
                 return;
             }
 
@@ -141,7 +140,7 @@ public abstract class UserTargetingCommand extends BaseCommand {
     public abstract void run(Player player) throws CommandException;
 
     protected Message getMessage() {
-        return config.getLocale().getEntityAffectSuccess();
+        return locale.getLocale().getEntityAffectSuccess();
     }
 
     protected Object[] getPlaceholders(Set<Player> target) {
@@ -151,18 +150,16 @@ public abstract class UserTargetingCommand extends BaseCommand {
     protected void sendSuccessMessage(CommandSender sender, Set<Player> target) {
         sendMessage(sender, getMessage().getSelf(), getPlaceholders(target));
 
-        val actor = sender instanceof Player
-                ? registry.get((Player) sender).getPrefixedName()
-                : sender.getName();
+        val others = getMessage().getOthers(sender, registry);
 
         if (!(sender instanceof ConsoleCommandSender)) {
-            sendMessage(Bukkit.getConsoleSender(), getMessage().getOthers(actor), getPlaceholders(target));
+            sendMessage(Bukkit.getConsoleSender(), others, getPlaceholders(target));
         }
 
         Bukkit.getOnlinePlayers().stream()
                 .filter(it -> it != sender)
                 .filter(it -> registry.get(it).getRank().getWeight() >= getRequiredRank().getWeight())
-                .forEach(it -> sendMessage(it, getMessage().getOthers(actor), getPlaceholders(target)));
+                .forEach(it -> sendMessage(it, others, getPlaceholders(target)));
     }
 
     @Override

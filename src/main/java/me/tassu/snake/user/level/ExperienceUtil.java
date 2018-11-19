@@ -22,30 +22,40 @@
  * SOFTWARE.
  */
 
-package me.tassu.snake.cmd.meta;
+package me.tassu.snake.user.level;
 
-import com.google.common.collect.ImmutableMap;
+import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import lombok.Getter;
-import me.tassu.easy.register.config.Config;
-import ninja.leaping.configurate.objectmapping.Setting;
+import lombok.val;
+import me.tassu.easy.register.core.IRegistrable;
+import me.tassu.snake.user.User;
+import me.tassu.snake.util.Chat;
+import me.tassu.snake.util.LocaleConfig;
 
-import java.util.Map;
-
-@Getter
 @Singleton
-@Config.Name("commands")
-public class CommandConfig extends Config<CommandConfig> {
+public class ExperienceUtil implements IRegistrable {
 
-    @Setting("permissions")
-    private Map<String, String> requiredRanks = ImmutableMap.<String, String>builder()
-            .put("help", "MEMBER")
-            .put("uptime", "MEMBER")
-            .put("setrank", "ADMIN")
-            .put("gamemode", "ADMIN")
-            .put("heal", "MODERATOR")
-            .put("feed", "MODERATOR")
-            .build();
+    @Inject
+    private LocaleConfig locale;
 
+    public void sendMessage(User user, long amount, String reason) {
+        if (!user.isOnline()) return;
+        val bukkit = user.getPlayer().orElseThrow(RuntimeException::new);
+
+        bukkit.sendMessage(Chat.format(locale.getLocale().getExperienceGainMessage(), amount, reason));
+    }
+
+    public void sendLevelUpMessage(User user, int level) {
+        if (!user.isOnline()) return;
+        val bukkit = user.getPlayer().orElseThrow(RuntimeException::new);
+
+        for (String msg : locale.getLocale().getLevelUpMessage()) {
+            if (msg.contains("{LEVEL}")) {
+                msg = msg.replace("{LEVEL}", String.valueOf(level));
+            }
+
+            bukkit.sendMessage(Chat.center(Chat.format(msg)));
+        }
+    }
 
 }

@@ -28,7 +28,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.val;
 import me.tassu.easy.register.command.Aliases;
-import me.tassu.snake.cmd.meta.CommandConfig;
+import me.tassu.snake.util.LocaleConfig;
 import me.tassu.snake.cmd.meta.Message;
 import me.tassu.snake.cmd.meta.UserTargetingCommand;
 import me.tassu.snake.user.UserRegistry;
@@ -53,7 +53,7 @@ public class SetRankCommand extends UserTargetingCommand {
     private RankConfig rankConfig;
 
     @Inject
-    private CommandConfig config;
+    private LocaleConfig locale;
 
     public SetRankCommand() {
         super("setrank");
@@ -71,12 +71,12 @@ public class SetRankCommand extends UserTargetingCommand {
 
     @Override
     protected Object[] getPlaceholders(Set<Player> target) {
-        return new Object[] {nameOrCount(target), rankConfig.byName(getArguments().get(0)).getName()};
+        return new Object[] {rankConfig.byName(getArguments().get(0)).getName(), nameOrCount(target)};
     }
 
     @Override
     protected Message getMessage() {
-        return config.getLocale().getSetRankMessage();
+        return locale.getLocale().getSetRankMessage();
     }
 
     @Override

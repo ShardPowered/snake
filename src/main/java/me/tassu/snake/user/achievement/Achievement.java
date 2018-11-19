@@ -22,30 +22,20 @@
  * SOFTWARE.
  */
 
-package me.tassu.snake.cmd.meta;
+package me.tassu.snake.user.achievement;
 
-import com.google.common.collect.ImmutableMap;
-import com.google.inject.Singleton;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
-import me.tassu.easy.register.config.Config;
-import ninja.leaping.configurate.objectmapping.Setting;
-
-import java.util.Map;
 
 @Getter
-@Singleton
-@Config.Name("commands")
-public class CommandConfig extends Config<CommandConfig> {
+@AllArgsConstructor
+public enum Achievement {
 
-    @Setting("permissions")
-    private Map<String, String> requiredRanks = ImmutableMap.<String, String>builder()
-            .put("help", "MEMBER")
-            .put("uptime", "MEMBER")
-            .put("setrank", "ADMIN")
-            .put("gamemode", "ADMIN")
-            .put("heal", "MODERATOR")
-            .put("feed", "MODERATOR")
-            .build();
+    FIRST_JOIN("First join", 10)
 
+    ;
+
+    private String name;
+    private int experience;
 
 }

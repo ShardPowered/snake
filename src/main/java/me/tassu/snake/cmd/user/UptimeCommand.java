@@ -30,7 +30,7 @@ import lombok.val;
 import me.tassu.easy.register.command.Aliases;
 import me.tassu.easy.util.TimeUtil;
 import me.tassu.snake.cmd.meta.BaseCommand;
-import me.tassu.snake.cmd.meta.CommandConfig;
+import me.tassu.snake.util.LocaleConfig;
 import org.bukkit.command.CommandSender;
 
 import java.util.List;
@@ -40,7 +40,7 @@ import java.util.List;
 public class UptimeCommand extends BaseCommand {
 
     @Inject
-    private CommandConfig config;
+    private LocaleConfig locale;
 
     private final long started = System.currentTimeMillis();
 
@@ -52,6 +52,6 @@ public class UptimeCommand extends BaseCommand {
     @Override
     protected void run(CommandSender sender, String label, List<String> args) {
         val seconds = (System.currentTimeMillis() - started) / 1000;
-        sendMessage(sender, config.getLocale().getUptimeMessage(), TimeUtil.format(seconds, 0));
+        sendMessage(sender, locale.getLocale().getUptimeMessage(), TimeUtil.format(seconds, 0));
     }
 }

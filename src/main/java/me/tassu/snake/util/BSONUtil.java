@@ -22,30 +22,46 @@
  * SOFTWARE.
  */
 
-package me.tassu.snake.cmd.meta;
+package me.tassu.snake.util;
 
-import com.google.common.collect.ImmutableMap;
-import com.google.inject.Singleton;
-import lombok.Getter;
-import me.tassu.easy.register.config.Config;
-import ninja.leaping.configurate.objectmapping.Setting;
+import com.google.common.base.Preconditions;
+import com.google.common.collect.Sets;
+import lombok.val;
+import org.bson.Document;
 
-import java.util.Map;
+import java.util.List;
+import java.util.Objects;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
-@Getter
-@Singleton
-@Config.Name("commands")
-public class CommandConfig extends Config<CommandConfig> {
+/*
+ * https://github.com/Minespree/Feather/blob/master/src/main/java/net/minespree/feather/util/BSONUtil.java
+ */
+public class BSONUtil {
 
-    @Setting("permissions")
-    private Map<String, String> requiredRanks = ImmutableMap.<String, String>builder()
-            .put("help", "MEMBER")
-            .put("uptime", "MEMBER")
-            .put("setrank", "ADMIN")
-            .put("gamemode", "ADMIN")
-            .put("heal", "MODERATOR")
-            .put("feed", "MODERATOR")
-            .build();
+    public static Stream<String> stringListToStream(Document document, String key) {
+        Preconditions.checkNotNull(document);
+        Preconditions.checkNotNull(key);
 
+        //noinspection unchecked
+        val list = (List<Object>) document.get(key);
+
+        if (list == null) {
+            return null;
+        }
+
+        return list.stream().filter(Objects::nonNull).map(String::valueOf);
+    }
+
+    public static Set<String> stringListToSet(Document document, String key) {
+        val stream = stringListToStream(document, key);
+
+        if (stream == null) {
+            return Sets.newHashSet();
+        }
+
+        return stream.collect(Collectors.toSet());
+    }
 
 }

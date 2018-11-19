@@ -29,6 +29,7 @@ import com.google.inject.Singleton;
 import lombok.val;
 import me.tassu.easy.register.core.IRegistrable;
 import me.tassu.snake.util.Chat;
+import me.tassu.snake.util.LocaleConfig;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 
@@ -36,13 +37,13 @@ import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 public class NoPrefixedCommand implements IRegistrable {
 
     @Inject
-    private CommandConfig config;
+    private LocaleConfig locale;
 
     @EventHandler(ignoreCancelled = true)
     public void onCommand(PlayerCommandPreprocessEvent event) {
         val parts = event.getMessage().split(" ");
         if (parts[0].contains(":")) {
-            event.getPlayer().sendMessage(Chat.format(config.getLocale().getNoPrefixing()));
+            event.getPlayer().sendMessage(Chat.format(locale.getLocale().getNoPrefixing()));
             event.setCancelled(true);
         }
     }

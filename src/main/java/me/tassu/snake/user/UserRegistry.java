@@ -33,22 +33,17 @@ import lombok.val;
 import me.tassu.easy.log.Log;
 import me.tassu.easy.register.core.IRegistrable;
 import me.tassu.simple.TaskChainModule;
-import me.tassu.snake.cmd.meta.CommandConfig;
 import me.tassu.snake.db.MongoManager;
+import me.tassu.snake.user.level.ExperienceUtil;
 import me.tassu.snake.user.rank.RankConfig;
-import me.tassu.snake.util.Chat;
 import org.bson.Document;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
-import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerPreLoginEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.UUID;
-import java.util.WeakHashMap;
+import java.util.*;
 
 import static com.mongodb.client.model.Filters.eq;
 
@@ -62,6 +57,9 @@ public class UserRegistry implements IRegistrable {
 
     @Inject
     private TaskChainModule chain;
+
+    @Inject
+    private ExperienceUtil experienceUtil;
 
     @Inject
     private Log log;
@@ -90,7 +88,7 @@ public class UserRegistry implements IRegistrable {
                 document = new Document();
             }
 
-            users.put(uuid, new User(uuid, document, config));
+            users.put(uuid, new User(uuid, document, config, experienceUtil));
         }
 
         return users.get(uuid);
@@ -102,16 +100,30 @@ public class UserRegistry implements IRegistrable {
 
     private void save(User user) {
         val queue = user.getSaveQueue();
-        if (queue.isEmpty()) return;
+        val setQueue = user.getSetSaveQueue();
+        if (queue.isEmpty() && setQueue.isEmpty()) return;
 
-        val document = new Document(new LinkedHashMap<>());
+        val addDocument = new Document(new LinkedHashMap<>());
+        val setDocument = new Document(new LinkedHashMap<>());
+        val updateDocument = new Document(new LinkedHashMap<>());
 
         for (val key : queue.keySet()) {
-            document.put(key, queue.get(key));
+            setDocument.put(key, queue.get(key));
         }
 
-        val updateDocument = new Document();
-        updateDocument.put("$set", document);
+        setQueue.asMap().forEach(addDocument::put);
+
+        if (!addDocument.isEmpty()) {
+            addDocument.forEach((key, val) -> {
+                if (val instanceof Collection) {
+                    updateDocument.put("$addToSet", new Document(key, new Document("$each", val)));
+                } else {
+                    updateDocument.put("$addToSet", val);
+                }
+            });
+        }
+
+        updateDocument.put("$set", setDocument);
 
         val result = mongo.getDatabase().getCollection(UserKey.COLLECTION)
                 .updateOne(eq(UserKey.UUID, user.getUuid().toString()), updateDocument, SAVE_OPTIONS);

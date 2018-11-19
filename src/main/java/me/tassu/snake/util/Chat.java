@@ -72,6 +72,7 @@ public class Chat {
     public static final String SMALL_DOT = "•";
     public static final String LARGE_DOT = "●";
     public static final String HEART = "♥";
+    public static final String PLUS = "✚";
     public static final String SMALL_ARROWS_RIGHT = "»";
     public static final String SMALL_ARROWS_LEFT = "«";
     public static final String BIG_HORIZONTAL_LINE = "▍";

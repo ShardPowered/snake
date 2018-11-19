@@ -26,15 +26,14 @@ package me.tassu.snake.util;
 
 import com.google.inject.Inject;
 import me.tassu.easy.api.message.SimpleMessageProvider;
-import me.tassu.snake.cmd.meta.CommandConfig;
 import org.bukkit.command.CommandSender;
 
 public class Messager extends SimpleMessageProvider {
 
-    @Inject private CommandConfig commandConfig;
+    @Inject private LocaleConfig locale;
 
     @Override
     public void sendMissingPermissionMessage(CommandSender sender, String permission) {
-        sender.sendMessage(Chat.format(commandConfig.getLocale().getPermissionMessage()));
+        sender.sendMessage(Chat.format(locale.getLocale().getPermissionMessage()));
     }
 }

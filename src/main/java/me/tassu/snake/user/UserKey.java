@@ -33,4 +33,5 @@ public class UserKey {
     public static final String EXPERIENCE = "exp";
     public static final String FIRST_JOIN = "first_join";
     public static final String NICKNAME = "last_known_name";
+    public static final String ACHIEVEMENTS = "achievements";
 }

@@ -41,16 +41,13 @@ public class SnakeAPI {
     @Getter
     private static SnakeAPI instance;
 
-    public SnakeAPI(Injector injector) {
+    public SnakeAPI() {
         if (instance != null) {
             throw new IllegalStateException();
         }
 
         instance = this;
-        this.injector = injector;
     }
-
-    private Injector injector;
 
     @Inject
     private UserRegistry userRegistry;

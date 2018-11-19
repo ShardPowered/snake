@@ -29,11 +29,10 @@ import com.google.inject.Singleton;
 import lombok.val;
 import me.tassu.easy.register.command.Aliases;
 import me.tassu.easy.register.command.error.CommandException;
-import me.tassu.snake.cmd.meta.CommandConfig;
+import me.tassu.snake.util.LocaleConfig;
 import me.tassu.snake.cmd.meta.Message;
 import me.tassu.snake.cmd.meta.UserTargetingCommand;
 import me.tassu.snake.cmd.meta.ex.UsageException;
-import me.tassu.snake.user.rank.Rank;
 import org.bukkit.GameMode;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -50,7 +49,7 @@ import java.util.stream.Collectors;
 public class GameModeCommand extends UserTargetingCommand {
 
     @Inject
-    private CommandConfig config;
+    private LocaleConfig locale;
 
     public GameModeCommand() {
         super("gamemode");
@@ -72,12 +71,12 @@ public class GameModeCommand extends UserTargetingCommand {
 
     @Override
     protected Message getMessage() {
-        return config.getLocale().getGamemodeSetMessage();
+        return locale.getLocale().getGamemodeSetMessage();
     }
 
     @Override
     protected Object[] getPlaceholders(Set<Player> target) {
-        return new Object[] {nameOrCount(target), Objects.requireNonNull(byName(getArguments().get(0))).name()};
+        return new Object[] {Objects.requireNonNull(byName(getArguments().get(0))).name(), nameOrCount(target)};
     }
 
     private GameMode byName(String name) {

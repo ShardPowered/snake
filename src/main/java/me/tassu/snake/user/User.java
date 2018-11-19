@@ -25,24 +25,32 @@
 package me.tassu.snake.user;
 
 import com.google.common.base.Preconditions;
+import com.google.common.collect.HashMultimap;
+import com.google.common.collect.Multimap;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.val;
 import me.tassu.snake.api.event.PostUserExperienceGainEvent;
+import me.tassu.snake.user.achievement.Achievement;
+import me.tassu.snake.user.level.ExperienceUtil;
 import me.tassu.snake.user.level.LevelUtil;
 import me.tassu.snake.user.rank.Rank;
 import me.tassu.snake.user.rank.RankConfig;
+import me.tassu.snake.util.BSONUtil;
 import org.bson.Document;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 @Getter
 public class User {
+
+    @Getter(AccessLevel.NONE)
+    private ExperienceUtil experienceUtil;
+
+    @Getter(AccessLevel.PACKAGE)
+    private Multimap<String, Object> setSaveQueue = HashMultimap.create();
 
     @Getter(AccessLevel.PACKAGE)
     private Map<String, Object> saveQueue = new HashMap<>();
@@ -50,6 +58,12 @@ public class User {
     private void addToSaveQueue(String key, Object value) {
         saveQueue.put(key, value);
     }
+
+    private void addToSetSaveQueue(String key, Object value) {
+        setSaveQueue.put(key, value);
+    }
+
+    private Set<String> achievements;
 
     private UUID uuid;
 
@@ -67,8 +81,10 @@ public class User {
         return LevelUtil.getProgress(totalExperience, getLevel());
     }
 
-    User(UUID uuid, Document document, RankConfig config) {
+    User(UUID uuid, Document document, RankConfig config, ExperienceUtil experienceUtil) {
         Preconditions.checkNotNull(uuid);
+
+        this.experienceUtil = experienceUtil;
 
         this.uuid = uuid;
         this.rank = config.byName(document.getString(UserKey.RANK));
@@ -82,17 +98,46 @@ public class User {
         val nickname = document.getString(UserKey.NICKNAME);
         this.userName = nickname == null ? "Steve" : nickname;
 
+        this.achievements = BSONUtil.stringListToSet(document, UserKey.ACHIEVEMENTS);
+
         addToSaveQueue(UserKey.UUID, uuid.toString());
 
         // nickname and tag updated by UserRegistry#onPlayerJoin
     }
 
-    public void addExperience(long experience) {
-        // TODO check levelup and add rewards
-        this.totalExperience += experience;
-        addToSaveQueue(UserKey.EXPERIENCE, totalExperience);
+    @SuppressWarnings({"UnusedReturnValue", "WeakerAccess"})
+    public boolean addExperience(long experience, String reason) {
+        if (experience < 1) {
+            throw new IllegalArgumentException("You must give at least 1 experience.");
+        }
 
+        val oldLevel = getLevel();
+        this.totalExperience += experience;
+        boolean levelUp = oldLevel != getLevel();
+
+        experienceUtil.sendMessage(this, experience, reason);
+
+        if (levelUp) {
+            for (int i = oldLevel + 1; i <= getLevel(); i++) {
+                experienceUtil.sendLevelUpMessage(this, i);
+            }
+        }
+
+        addToSaveQueue(UserKey.EXPERIENCE, totalExperience);
         Bukkit.getPluginManager().callEvent(new PostUserExperienceGainEvent(this));
+
+        return levelUp;
+    }
+
+    public void addAchievement(Achievement achievement) {
+        if (achievements.contains(achievement.name())) {
+            return;
+        }
+
+        achievements.add(achievement.name());
+        addToSetSaveQueue(UserKey.ACHIEVEMENTS, achievement.name());
+
+        addExperience(achievement.getExperience(), achievement.getName());
     }
 
     public void setNickname(String nickname) {
@@ -115,7 +160,7 @@ public class User {
             if (rank.getTablistMode() == Rank.TablistMode.SHOW_PREFIX) {
                 player.setPlayerListName(getPrefixedName());
             } else if (rank.getTablistMode() == Rank.TablistMode.SHOW_COLOR) {
-                player.setPlayerListName(rank.getPrimary().toString() + getUserName());
+                player.setPlayerListName(getColoredName());
             } else {
                 player.setPlayerListName(null);
             }
@@ -137,4 +182,9 @@ public class User {
     public String getPrefixedName() {
         return getRank().getTag() + getUserName();
     }
+
+    public String getColoredName() {
+        return getRank().getPrimary() + getUserName();
+    }
+
 }

@@ -24,6 +24,7 @@
 
 package me.tassu.snake;
 
+import com.google.inject.Binder;
 import com.google.inject.Inject;
 import io.papermc.lib.PaperLib;
 import me.tassu.easy.EasyPlugin;
@@ -35,6 +36,9 @@ import me.tassu.snake.api.SnakeAPI;
 import me.tassu.snake.chat.ChatConfig;
 import me.tassu.snake.chat.ChatFormatter;
 import me.tassu.snake.cmd.meta.CommandConfig;
+import me.tassu.snake.user.achievement.AchievementListener;
+import me.tassu.snake.user.level.ExperienceUtil;
+import me.tassu.snake.util.LocaleConfig;
 import me.tassu.snake.cmd.meta.NoPrefixedCommand;
 import me.tassu.snake.cmd.staff.FeedCommand;
 import me.tassu.snake.cmd.staff.GameModeCommand;
@@ -67,8 +71,6 @@ public final class SnakePlugin extends EasyPlugin {
             return;
         }
 
-        __unsafe__getInjector().injectMembers(new SnakeAPI(__unsafe__getInjector()));
-
         registerAll(
                 MongoConfig.class,
                 MongoManager.class,
@@ -76,18 +78,20 @@ public final class SnakePlugin extends EasyPlugin {
                 UserSaver.class,
 
                 TaskChainModule.class,
+                ExperienceUtil.class,
                 RankUtil.class,
 
                 CommandConfig.class,
+                LocaleConfig.class,
                 RankConfig.class,
                 ChatConfig.class,
 
+                AchievementListener.class,
+                NoPrefixedCommand.class,
                 ChatFormatter.class,
 
-                NoPrefixedCommand.class,
-
-                HelpCommand.class,
                 UptimeCommand.class,
+                HelpCommand.class,
 
                 GameModeCommand.class,
                 SetRankCommand.class,
@@ -106,6 +110,11 @@ public final class SnakePlugin extends EasyPlugin {
     @Override
     protected BindManager getBinder() {
         return new BindManager() {
+            @Override
+            public void bindCustom(Binder binder) {
+                binder.bind(SnakeAPI.class).toInstance(new SnakeAPI());
+            }
+
             @Override
             public Class<? extends IMessageProvider> getMessageProvider() {
                 return Messager.class;

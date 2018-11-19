@@ -26,9 +26,13 @@ package me.tassu.snake.cmd.meta;
 
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
-import me.tassu.snake.util.Chat;
+import lombok.val;
+import me.tassu.snake.user.UserRegistry;
+import me.tassu.snake.util.LocaleConfig;
 import ninja.leaping.configurate.objectmapping.Setting;
 import ninja.leaping.configurate.objectmapping.serialize.ConfigSerializable;
+import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -40,9 +44,12 @@ public class Message {
             throw new IllegalArgumentException("too short message");
         }
 
-        return new Message(prefix + message, prefix + Chat.WHITE + "{ACTOR} "
-                + Chat.GRAY + Character.toLowerCase(message.charAt(0)) + message.substring(1));
+        return new Message(LocaleConfig.UserNameMode.NAME_ONLY, prefix + message, prefix + "{ACTOR} "
+                + Character.toLowerCase(message.charAt(0)) + message.substring(1));
     }
+
+    @Setting
+    private LocaleConfig.UserNameMode actorMode = LocaleConfig.UserNameMode.NAME_ONLY;
 
     @Setting
     private String self, others;
@@ -51,7 +58,17 @@ public class Message {
         return self;
     }
 
-    public String getOthers(String actor) {
-        return others.replace("{ACTOR}", actor);
+    public String getOthers(CommandSender actor, UserRegistry userRegistry) {
+        if (actor instanceof Player && actorMode != LocaleConfig.UserNameMode.NAME_ONLY) {
+            val player = userRegistry.get((Player) actor);
+            switch (actorMode) {
+                case FULL:
+                    return others.replace("{ACTOR}", player.getPrefixedName());
+                case COLORED:
+                    return others.replace("{ACTOR}", player.getColoredName());
+            }
+        }
+
+        return others.replace("{ACTOR}", actor.getName());
     }
 }
