@@ -31,6 +31,7 @@ public class AchievementBuilder {
 
     private final String id;
     private String name;
+    private String description;
     private int experience = 0;
 
     private AchievementBuilder(String id) {
@@ -43,6 +44,11 @@ public class AchievementBuilder {
 
     public AchievementBuilder setName(String name) {
         this.name = name;
+        return this;
+    }
+
+    public AchievementBuilder setDescription(String description) {
+        this.description = description;
         return this;
     }
 

@@ -28,6 +28,7 @@ public interface Achievement {
 
     String getId();
     String getName();
+    String getDescription();
 
     int getExperienceReward();
 

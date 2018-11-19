@@ -41,10 +41,12 @@ public class StandardAchievements implements IRegistrable {
     public void register() {
         registry.register(AchievementBuilder.builder(FIRST_JOIN)
                 .setName("First join")
+                .setDescription("Join the server. It's that simple.")
                 .setExperience(10));
 
         registry.register(AchievementBuilder.builder(CHAT)
                 .setName("Your beautiful voice")
+                .setDescription("Talk in chat.")
                 .setExperience(25));
     }
 }

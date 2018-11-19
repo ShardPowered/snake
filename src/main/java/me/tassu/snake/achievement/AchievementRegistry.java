@@ -35,8 +35,10 @@ import me.tassu.easy.register.core.IRegistrable;
 import me.tassu.snake.db.MongoManager;
 import org.bson.Document;
 
+import java.util.Collection;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.Consumer;
 
 @Singleton
@@ -53,6 +55,7 @@ public class AchievementRegistry implements IRegistrable {
                 .forEach((Consumer<Document>) document -> {
                     val achievement = AchievementBuilder.builder(document.getString(ID))
                             .setName(document.getString(NAME))
+                            .setDescription(document.getString(DESCRIPTION))
                             .setExperience(document.getInteger(EXP_REWARD));
 
                     achievementMap.put(achievement.getId(), new AchievementInstance(achievement));
@@ -71,6 +74,7 @@ public class AchievementRegistry implements IRegistrable {
     private static final String COLLECTION = "achievements";
     private static final String ID = "_id";
     private static final String NAME = "name";
+    private static final String DESCRIPTION = "description";
     private static final String EXP_REWARD = "exp_reward";
 
     public Achievement register(AchievementBuilder achievement) {
@@ -78,17 +82,28 @@ public class AchievementRegistry implements IRegistrable {
         Preconditions.checkNotNull(achievement.getName()); // others should not be null
 
         if (achievementMap.containsKey(achievement.getId())) {
-            return achievementMap.get(achievement.getId());
+            val existing = (AchievementInstance) achievementMap.get(achievement.getId());
+
+            //noinspection EqualsBetweenInconvertibleTypes - see AchievementInstance
+            if (!existing.equals(achievement)) {
+                log.debug("Updating achievement {} in database", achievement.getId());
+
+                existing.update(achievement);
+
+                mongo.getDatabase().getCollection(COLLECTION)
+                        .replaceOne(new Document(ID, achievement.getId()), existing.toDocument());
+            }
+
+            return existing;
         }
 
         val instance = new AchievementInstance(achievement);
         achievementMap.put(instance.getId(), instance);
 
+        log.debug("Saving achievement {} in database", instance.getId());
+
         mongo.getDatabase().getCollection(COLLECTION)
-                .insertOne(new Document()
-                        .append(ID, achievement.getId())
-                        .append(NAME, achievement.getName())
-                        .append(EXP_REWARD, achievement.getExperience()));
+                .insertOne(instance.toDocument());
 
         return instance;
     }
@@ -97,15 +112,54 @@ public class AchievementRegistry implements IRegistrable {
         return Optional.ofNullable(achievementMap.get(id));
     }
 
+    public Collection<Achievement> getAchievements() {
+        return achievementMap.values();
+    }
+
     @Getter
     private class AchievementInstance implements Achievement {
-        private final String name, id;
-        private final int experienceReward;
+        private String name, id, description;
+        private int experienceReward;
 
         public AchievementInstance(AchievementBuilder builder) {
+            update(builder);
+        }
+
+        public void update(AchievementBuilder builder) {
             this.name = builder.getName();
             this.id = builder.getId();
+            this.description = builder.getDescription();
             this.experienceReward = builder.getExperience();
+        }
+
+        public Document toDocument() {
+            return new Document()
+                    .append(ID, getId())
+                    .append(NAME, getName())
+                    .append(DESCRIPTION, getDescription())
+                    .append(EXP_REWARD, getExperienceReward());
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (o == null) return false;
+            if (o instanceof Achievement) {
+                val achievement = (Achievement) o;
+                return achievement.getId().equals(getId())
+                        && achievement.getName().equals(getName())
+                        && achievement.getDescription().equals(getDescription())
+                        && achievement.getExperienceReward() == getExperienceReward();
+            }
+
+            if (o instanceof AchievementBuilder) {
+                val achievement = (AchievementBuilder) o;
+                return achievement.getId().equals(getId())
+                        && achievement.getName().equals(getName())
+                        && achievement.getDescription().equals(getDescription())
+                        && achievement.getExperience() == getExperienceReward();
+            }
+
+            return false;
         }
     }
 

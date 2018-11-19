@@ -28,11 +28,14 @@ import com.google.inject.Inject;
 import com.google.inject.Injector;
 import com.google.inject.Singleton;
 import lombok.Getter;
+import me.tassu.snake.achievement.AchievementRegistry;
+import me.tassu.snake.db.MongoManager;
 import me.tassu.snake.user.UserParser;
 import me.tassu.snake.user.UserRegistry;
 import me.tassu.snake.user.level.LevelUtil;
 import me.tassu.snake.user.rank.RankConfig;
 import me.tassu.snake.user.rank.RankUtil;
+import me.tassu.snake.util.LocaleConfig;
 
 @Getter
 @Singleton
@@ -63,5 +66,14 @@ public class SnakeAPI {
 
     @Inject
     private LevelUtil levelUtil;
+
+    @Inject
+    private AchievementRegistry achievementRegistry;
+
+    @Inject
+    private MongoManager mongoManager;
+
+    @Inject
+    private LocaleConfig localeConfig;
 
 }
