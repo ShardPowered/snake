@@ -44,7 +44,7 @@ public class BSONUtil {
         Preconditions.checkNotNull(document);
         Preconditions.checkNotNull(key);
 
-        //noinspection unchecked
+        @SuppressWarnings("unchecked")
         val list = (List<Object>) document.get(key);
 
         if (list == null) {

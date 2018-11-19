@@ -31,7 +31,7 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.val;
 import me.tassu.snake.api.event.PostUserExperienceGainEvent;
-import me.tassu.snake.user.achievement.Achievement;
+import me.tassu.snake.achievement.Achievement;
 import me.tassu.snake.user.level.ExperienceUtil;
 import me.tassu.snake.user.level.LevelUtil;
 import me.tassu.snake.user.rank.Rank;
@@ -108,7 +108,7 @@ public class User {
     @SuppressWarnings({"UnusedReturnValue", "WeakerAccess"})
     public boolean addExperience(long experience, String reason) {
         if (experience < 1) {
-            throw new IllegalArgumentException("You must give at least 1 experience.");
+            return false;
         }
 
         val oldLevel = getLevel();

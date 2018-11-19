@@ -32,11 +32,13 @@ import me.tassu.easy.api.binder.BindManager;
 import me.tassu.easy.api.message.IMessageProvider;
 import me.tassu.easy.log.Log;
 import me.tassu.simple.TaskChainModule;
+import me.tassu.snake.achievement.StandardAchievements;
 import me.tassu.snake.api.SnakeAPI;
 import me.tassu.snake.chat.ChatConfig;
 import me.tassu.snake.chat.ChatFormatter;
 import me.tassu.snake.cmd.meta.CommandConfig;
-import me.tassu.snake.user.achievement.AchievementListener;
+import me.tassu.snake.achievement.AchievementListener;
+import me.tassu.snake.achievement.AchievementRegistry;
 import me.tassu.snake.user.level.ExperienceUtil;
 import me.tassu.snake.util.LocaleConfig;
 import me.tassu.snake.cmd.meta.NoPrefixedCommand;
@@ -77,6 +79,7 @@ public final class SnakePlugin extends EasyPlugin {
                 UserRegistry.class,
                 UserSaver.class,
 
+                AchievementRegistry.class,
                 TaskChainModule.class,
                 ExperienceUtil.class,
                 RankUtil.class,
@@ -87,6 +90,8 @@ public final class SnakePlugin extends EasyPlugin {
                 ChatConfig.class,
 
                 AchievementListener.class,
+                StandardAchievements.class,
+
                 NoPrefixedCommand.class,
                 ChatFormatter.class,
 

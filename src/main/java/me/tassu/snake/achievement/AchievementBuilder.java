@@ -22,13 +22,33 @@
  * SOFTWARE.
  */
 
-package me.tassu.snake.user.achievement;
+package me.tassu.snake.achievement;
 
-public interface Achievement {
+import lombok.Getter;
 
-    String getId();
-    String getName();
+@Getter
+public class AchievementBuilder {
 
-    int getExperienceReward();
+    private final String id;
+    private String name;
+    private int experience = 0;
+
+    private AchievementBuilder(String id) {
+        this.id = id;
+    }
+
+    public static AchievementBuilder builder(String id) {
+        return new AchievementBuilder(id);
+    }
+
+    public AchievementBuilder setName(String name) {
+        this.name = name;
+        return this;
+    }
+
+    public AchievementBuilder setExperience(int experience) {
+        this.experience = experience;
+        return this;
+    }
 
 }

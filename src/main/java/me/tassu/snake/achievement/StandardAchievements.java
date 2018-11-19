@@ -22,32 +22,22 @@
  * SOFTWARE.
  */
 
-package me.tassu.snake.user.achievement;
+package me.tassu.snake.achievement;
 
-import lombok.AllArgsConstructor;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
+import me.tassu.easy.register.core.IRegistrable;
 
-@AllArgsConstructor
-public enum StandardAchievement implements Achievement {
+@Singleton
+public class StandardAchievements implements IRegistrable {
 
-    FIRST_JOIN("First join", 10)
-
-    ;
-
-    private String name;
-    private int experience;
+    @Inject
+    private AchievementRegistry registry;
 
     @Override
-    public String getId() {
-        return name();
-    }
-
-    @Override
-    public String getName() {
-        return name;
-    }
-
-    @Override
-    public int getExperienceReward() {
-        return experience;
+    public void register() {
+        registry.register(AchievementBuilder.builder("FIRST_JOIN")
+                .setName("First join")
+                .setExperience(10));
     }
 }

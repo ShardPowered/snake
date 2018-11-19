@@ -22,33 +22,13 @@
  * SOFTWARE.
  */
 
-package me.tassu.snake.user.achievement;
+package me.tassu.snake.achievement;
 
-import com.google.inject.Inject;
-import com.google.inject.Singleton;
-import me.tassu.easy.register.core.IRegistrable;
-import me.tassu.simple.TaskChainModule;
-import me.tassu.snake.user.UserRegistry;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.player.PlayerJoinEvent;
+public interface Achievement {
 
-import java.util.concurrent.TimeUnit;
+    String getId();
+    String getName();
 
-@Singleton
-public class AchievementListener implements IRegistrable {
+    int getExperienceReward();
 
-    @Inject
-    private UserRegistry userRegistry;
-
-    @Inject
-    private TaskChainModule taskChainModule;
-
-    @EventHandler(ignoreCancelled = true)
-    public void onPlayerJoin(PlayerJoinEvent event) {
-        taskChainModule.newChain()
-                .delay(5, TimeUnit.SECONDS)
-                .asyncFirst(() -> userRegistry.get(event.getPlayer()))
-                .syncLast(user -> user.addAchievement(StandardAchievement.FIRST_JOIN))
-                .execute();
-    }
 }
