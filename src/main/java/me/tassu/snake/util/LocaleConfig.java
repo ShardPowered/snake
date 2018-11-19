@@ -95,6 +95,14 @@ public class LocaleConfig extends Config<LocaleConfig> {
         @Setting("general-affected")
         private Message entityAffectSuccess = of(Chat.YELLOW, "Affected {0}" + Chat.YELLOW + ".");
 
+        @Setting("flight-toggled")
+        private Message flightToggled = of(Chat.YELLOW, "Toggled flight for {0}" + Chat.YELLOW + ".");
+
+        @Setting("flight-enabled")
+        private Message flightEnabled = of(Chat.YELLOW, "Enabled flight for {0}" + Chat.YELLOW + ".");
+
+        @Setting("flight-disabled")
+        private Message flightDisabled = of(Chat.YELLOW, "Disabled flight for {0}" + Chat.YELLOW + ".");
     }
 
 }

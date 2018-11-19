@@ -95,26 +95,31 @@ public abstract class UserTargetingCommand extends BaseCommand {
 
     @Override
     public final void run(CommandSender sender, String label, List<String> args) throws CommandException {
-        if (args.isEmpty()) {
-            if (!useArguments && sender instanceof Player) {
-                args = Lists.newArrayList(sender.getName());
-            } else {
-                sendMessage(sender, locale.getLocale().getUsageMessage(), getUsage());
-                return;
-            }
-        }
-
-        if (useArguments) {
-            arguments = ArrayUtil.withoutFirst(args);
-
-            if (arguments.size() < requireArguments) {
-                if (arguments.size() + 1 >= requireArguments && defaultToSelf && sender instanceof Player) {
-                    arguments = args;
+        if (args.isEmpty() && useArguments && defaultToSelf && sender instanceof Player && requireArguments == 0) {
+            arguments = Lists.newArrayList();
+            args = Lists.newArrayList(sender.getName());
+        } else {
+            if (args.isEmpty()) {
+                if (!useArguments && sender instanceof Player) {
                     args = Lists.newArrayList(sender.getName());
                 } else {
-                    arguments = null;
                     sendMessage(sender, locale.getLocale().getUsageMessage(), getUsage());
                     return;
+                }
+            }
+
+            if (useArguments) {
+                arguments = ArrayUtil.withoutFirst(args);
+
+                if (arguments.size() < requireArguments) {
+                    if (arguments.size() + 1 >= requireArguments && defaultToSelf && sender instanceof Player) {
+                        arguments = args;
+                        args = Lists.newArrayList(sender.getName());
+                    } else {
+                        arguments = null;
+                        sendMessage(sender, locale.getLocale().getUsageMessage(), getUsage());
+                        return;
+                    }
                 }
             }
         }

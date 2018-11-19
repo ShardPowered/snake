@@ -26,10 +26,13 @@ package me.tassu.snake.achievement;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.val;
 import me.tassu.easy.register.core.IRegistrable;
 import me.tassu.simple.TaskChainModule;
 import me.tassu.snake.user.UserRegistry;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
+import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 
 import java.util.concurrent.TimeUnit;
@@ -46,11 +49,12 @@ public class AchievementListener implements IRegistrable {
     @Inject
     private TaskChainModule taskChainModule;
 
-    private Achievement firstJoinAchievement;
+    private Achievement firstJoinAchievement, chatAchievement;
 
     @Override
     public void register() {
-        firstJoinAchievement = registry.byId("FIRST_JOIN").orElse(null);
+        firstJoinAchievement = registry.byId(StandardAchievements.FIRST_JOIN).orElse(null);
+        chatAchievement = registry.byId(StandardAchievements.CHAT).orElse(null);
     }
 
     @EventHandler(ignoreCancelled = true)
@@ -64,5 +68,15 @@ public class AchievementListener implements IRegistrable {
                 .asyncFirst(() -> userRegistry.get(event.getPlayer()))
                 .syncLast(user -> user.addAchievement(firstJoinAchievement))
                 .execute();
+    }
+
+    @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
+    public void onAsyncPlayerChat(AsyncPlayerChatEvent event) {
+        if (chatAchievement == null) {
+            return;
+        }
+
+        val user = userRegistry.get(event.getPlayer());
+        user.addAchievement(chatAchievement);
     }
 }

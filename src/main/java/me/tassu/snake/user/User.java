@@ -30,8 +30,10 @@ import com.google.common.collect.Multimap;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.val;
+import me.tassu.snake.api.event.PostUserAchievementGainEvent;
 import me.tassu.snake.api.event.PostUserExperienceGainEvent;
 import me.tassu.snake.achievement.Achievement;
+import me.tassu.snake.api.event.PostUserLevelUpEvent;
 import me.tassu.snake.user.level.ExperienceUtil;
 import me.tassu.snake.user.level.LevelUtil;
 import me.tassu.snake.user.rank.Rank;
@@ -119,23 +121,30 @@ public class User {
 
         if (levelUp) {
             for (int i = oldLevel + 1; i <= getLevel(); i++) {
+                Bukkit.getPluginManager().callEvent(new PostUserLevelUpEvent(this, i - 1, i));
                 experienceUtil.sendLevelUpMessage(this, i);
             }
         }
 
         addToSaveQueue(UserKey.EXPERIENCE, totalExperience);
-        Bukkit.getPluginManager().callEvent(new PostUserExperienceGainEvent(this));
+        Bukkit.getPluginManager().callEvent(new PostUserExperienceGainEvent(this, experience, reason));
 
         return levelUp;
     }
 
     public void addAchievement(Achievement achievement) {
+        if (achievement == null) {
+            return;
+        }
+
         if (achievements.contains(achievement.getId())) {
             return;
         }
 
         achievements.add(achievement.getId());
         addToSetSaveQueue(UserKey.ACHIEVEMENTS, achievement.getId());
+
+        Bukkit.getPluginManager().callEvent(new PostUserAchievementGainEvent(this, achievement));
 
         addExperience(achievement.getExperienceReward(), "completed achievement '" + achievement.getName() + "'");
     }

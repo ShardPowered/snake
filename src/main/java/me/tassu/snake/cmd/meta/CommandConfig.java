@@ -43,6 +43,7 @@ public class CommandConfig extends Config<CommandConfig> {
             .put("uptime", "MEMBER")
             .put("setrank", "ADMIN")
             .put("gamemode", "ADMIN")
+            .put("fly", "MODERATOR")
             .put("heal", "MODERATOR")
             .put("feed", "MODERATOR")
             .build();

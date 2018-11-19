@@ -31,13 +31,20 @@ import me.tassu.easy.register.core.IRegistrable;
 @Singleton
 public class StandardAchievements implements IRegistrable {
 
+    public static final String FIRST_JOIN = "FIRST_JOIN";
+    public static final String CHAT = "CHAT";
+
     @Inject
     private AchievementRegistry registry;
 
     @Override
     public void register() {
-        registry.register(AchievementBuilder.builder("FIRST_JOIN")
+        registry.register(AchievementBuilder.builder(FIRST_JOIN)
                 .setName("First join")
                 .setExperience(10));
+
+        registry.register(AchievementBuilder.builder(CHAT)
+                .setName("Your beautiful voice")
+                .setExperience(25));
     }
 }

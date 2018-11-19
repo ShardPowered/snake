@@ -39,6 +39,7 @@ import me.tassu.snake.chat.ChatFormatter;
 import me.tassu.snake.cmd.meta.CommandConfig;
 import me.tassu.snake.achievement.AchievementListener;
 import me.tassu.snake.achievement.AchievementRegistry;
+import me.tassu.snake.cmd.staff.FlyCommand;
 import me.tassu.snake.user.level.ExperienceUtil;
 import me.tassu.snake.util.LocaleConfig;
 import me.tassu.snake.cmd.meta.NoPrefixedCommand;
@@ -101,7 +102,8 @@ public final class SnakePlugin extends EasyPlugin {
                 GameModeCommand.class,
                 SetRankCommand.class,
                 FeedCommand.class,
-                HealCommand.class
+                HealCommand.class,
+                FlyCommand.class
         );
     }
 

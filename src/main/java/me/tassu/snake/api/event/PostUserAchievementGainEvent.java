@@ -22,36 +22,35 @@
  * SOFTWARE.
  */
 
-package me.tassu.snake.chat;
+package me.tassu.snake.api.event;
 
-import com.google.inject.Inject;
-import com.google.inject.Singleton;
-import lombok.val;
-import me.tassu.easy.register.core.IRegistrable;
-import me.tassu.snake.user.UserRegistry;
-import org.bukkit.ChatColor;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.EventPriority;
-import org.bukkit.event.player.AsyncPlayerChatEvent;
+import me.tassu.snake.achievement.Achievement;
+import me.tassu.snake.user.User;
+import org.bukkit.event.HandlerList;
 
-import java.text.MessageFormat;
+public class PostUserAchievementGainEvent extends BaseUserEvent {
 
-@Singleton
-public class ChatFormatter implements IRegistrable {
+    private final Achievement achievement;
 
-    @Inject
-    private UserRegistry registry;
-
-    @Inject
-    private ChatConfig config;
-
-    @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGHEST)
-    public void onAsyncPlayerChat(AsyncPlayerChatEvent event) {
-        val sender = registry.get(event.getPlayer());
-        val message = MessageFormat.format(ChatColor.translateAlternateColorCodes(
-                '&', config.getFormat()), sender.getPrefixedName(), "%2$s")
-                .replace(event.getPlayer().getName(), "%1$s");
-
-        event.setFormat(message);
+    public Achievement getAchievement() {
+        return achievement;
     }
+
+    public PostUserAchievementGainEvent(User user, Achievement achievement) {
+        super(user);
+        this.achievement = achievement;
+    }
+
+    private static final HandlerList handlers = new HandlerList();
+
+    @Override
+    public HandlerList getHandlers() {
+        return handlers;
+    }
+
+    public static HandlerList getHandlerList() {
+        return handlers;
+    }
+
+
 }

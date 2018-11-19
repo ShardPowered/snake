@@ -25,13 +25,17 @@
 package me.tassu.snake.api.event;
 
 import me.tassu.snake.user.User;
-import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 
 public class PostUserExperienceGainEvent extends BaseUserEvent {
 
-    public PostUserExperienceGainEvent(User user) {
+    private long experience;
+    private String reason;
+
+    public PostUserExperienceGainEvent(User user, long experience, String reason) {
         super(user);
+        this.experience = experience;
+        this.reason = reason;
     }
 
     private static final HandlerList handlers = new HandlerList();
@@ -43,5 +47,13 @@ public class PostUserExperienceGainEvent extends BaseUserEvent {
 
     public static HandlerList getHandlerList() {
         return handlers;
+    }
+
+    public long getExperience() {
+        return experience;
+    }
+
+    public String getReason() {
+        return reason;
     }
 }
