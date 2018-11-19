@@ -24,31 +24,30 @@
 
 package me.tassu.snake.user.achievement;
 
-import com.google.inject.Inject;
-import com.google.inject.Singleton;
-import me.tassu.easy.register.core.IRegistrable;
-import me.tassu.simple.TaskChainModule;
-import me.tassu.snake.user.UserRegistry;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.player.PlayerJoinEvent;
+import lombok.AllArgsConstructor;
 
-import java.util.concurrent.TimeUnit;
+@AllArgsConstructor
+public enum StandardAchievement implements Achievement {
 
-@Singleton
-public class AchievementListener implements IRegistrable {
+    FIRST_JOIN("First join", 10)
 
-    @Inject
-    private UserRegistry userRegistry;
+    ;
 
-    @Inject
-    private TaskChainModule taskChainModule;
+    private String name;
+    private int experience;
 
-    @EventHandler(ignoreCancelled = true)
-    public void onPlayerJoin(PlayerJoinEvent event) {
-        taskChainModule.newChain()
-                .delay(5, TimeUnit.SECONDS)
-                .asyncFirst(() -> userRegistry.get(event.getPlayer()))
-                .syncLast(user -> user.addAchievement(StandardAchievement.FIRST_JOIN))
-                .execute();
+    @Override
+    public String getId() {
+        return name();
+    }
+
+    @Override
+    public String getName() {
+        return name;
+    }
+
+    @Override
+    public int getExperienceReward() {
+        return experience;
     }
 }

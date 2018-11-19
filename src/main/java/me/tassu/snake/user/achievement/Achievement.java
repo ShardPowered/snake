@@ -24,18 +24,11 @@
 
 package me.tassu.snake.user.achievement;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
+public interface Achievement {
 
-@Getter
-@AllArgsConstructor
-public enum Achievement {
+    String getId();
+    String getName();
 
-    FIRST_JOIN("First join", 10)
-
-    ;
-
-    private String name;
-    private int experience;
+    int getExperienceReward();
 
 }

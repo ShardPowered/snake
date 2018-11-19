@@ -130,14 +130,14 @@ public class User {
     }
 
     public void addAchievement(Achievement achievement) {
-        if (achievements.contains(achievement.name())) {
+        if (achievements.contains(achievement.getId())) {
             return;
         }
 
-        achievements.add(achievement.name());
-        addToSetSaveQueue(UserKey.ACHIEVEMENTS, achievement.name());
+        achievements.add(achievement.getId());
+        addToSetSaveQueue(UserKey.ACHIEVEMENTS, achievement.getId());
 
-        addExperience(achievement.getExperience(), achievement.getName());
+        addExperience(achievement.getExperienceReward(), "completed achievement '" + achievement.getName() + "'");
     }
 
     public void setNickname(String nickname) {

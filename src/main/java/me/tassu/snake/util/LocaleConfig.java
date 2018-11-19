@@ -62,7 +62,7 @@ public class LocaleConfig extends Config<LocaleConfig> {
 
         // experience
         @Setting("experience-gain")
-        private String experienceGainMessage = Chat.GOLD + Chat.PLUS + Chat.YELLOW + " " + Chat.UNDERLINE + "{0}xp"
+        private String experienceGainMessage = Chat.GOLD + Chat.PLUS + Chat.YELLOW + " Gained " + Chat.UNDERLINE + "{0} experience"
                 + Chat.RESET + Chat.YELLOW + " ({1})";
 
         @Setting
