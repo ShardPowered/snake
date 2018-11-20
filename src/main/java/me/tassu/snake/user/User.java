@@ -26,6 +26,7 @@ package me.tassu.snake.user;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.HashMultimap;
+import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -44,6 +45,8 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Getter
 public class User {
@@ -65,7 +68,7 @@ public class User {
         setSaveQueue.put(key, value);
     }
 
-    private Set<String> achievements;
+    private Map<String, Long> achievements;
 
     private UUID uuid;
 
@@ -100,7 +103,9 @@ public class User {
         val nickname = document.getString(UserKey.NICKNAME);
         this.userName = nickname == null ? "Steve" : nickname;
 
-        this.achievements = BSONUtil.stringListToSet(document, UserKey.ACHIEVEMENTS);
+        val achievementDoc = BSONUtil.getSubDoc(document, UserKey.ACHIEVEMENTS);
+        this.achievements = achievementDoc.keySet().stream()
+                .collect(Collectors.toMap(Function.identity(), achievementDoc::getLong));
 
         addToSaveQueue(UserKey.UUID, uuid.toString());
 
@@ -137,12 +142,12 @@ public class User {
             return;
         }
 
-        if (achievements.contains(achievement.getId())) {
+        if (achievements.containsKey(achievement.getId())) {
             return;
         }
 
-        achievements.add(achievement.getId());
-        addToSetSaveQueue(UserKey.ACHIEVEMENTS, achievement.getId());
+        achievements.put(achievement.getId(), System.currentTimeMillis());
+        addToSaveQueue(UserKey.ACHIEVEMENTS + "." + achievement.getId(), System.currentTimeMillis());
 
         Bukkit.getPluginManager().callEvent(new PostUserAchievementGainEvent(this, achievement));
 

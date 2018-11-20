@@ -64,4 +64,8 @@ public class BSONUtil {
         return stream.collect(Collectors.toSet());
     }
 
+    public static Document getSubDoc(Document parent, String key) {
+        return (Document) parent.getOrDefault(key, new Document());
+    }
+
 }
