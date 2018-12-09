@@ -27,17 +27,23 @@ package me.tassu.snake.user.rank;
 import com.google.common.collect.Lists;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import com.mongodb.client.model.UpdateOptions;
 import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.val;
 import me.tassu.easy.log.Log;
 import me.tassu.easy.register.config.Config;
+import me.tassu.snake.db.MongoManager;
 import ninja.leaping.configurate.objectmapping.ObjectMappingException;
 import ninja.leaping.configurate.objectmapping.Setting;
+import org.bson.Document;
 import org.bukkit.ChatColor;
 
 import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
+
+import static com.mongodb.client.model.Filters.eq;
 
 @Getter
 @Singleton
@@ -47,6 +53,10 @@ public class RankConfig extends Config<RankConfig> {
     @Inject
     @Getter(AccessLevel.NONE)
     private Log log;
+
+    @Inject
+    @Getter(AccessLevel.NONE)
+    private MongoManager mongoManager;
 
     @Setting
     private List<Rank> ranks = Lists.newArrayList(
@@ -61,6 +71,21 @@ public class RankConfig extends Config<RankConfig> {
 
         if (ranks.isEmpty()) {
             throw new RuntimeException("No ranks loaded.");
+        }
+
+        val collection = mongoManager.getDatabase().getCollection("ranks");
+        val saveOptions = new UpdateOptions().upsert(true);
+
+        for (Rank rank : ranks) {
+            val document = new Document()
+                    .append("_id", rank.getName())
+                    .append("nickname", rank.getNickname())
+                    .append("weight", rank.getWeight())
+                    .append("primary", rank.getPrimary().getChar())
+                    .append("secondary", rank.getSecondary().getChar())
+                    .append("default", rank.isDefault());
+
+            collection.updateOne(eq("_id", rank.getName()), new Document("$set", document), saveOptions);
         }
     }
 

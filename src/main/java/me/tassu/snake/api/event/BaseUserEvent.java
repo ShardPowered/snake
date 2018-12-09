@@ -30,6 +30,11 @@ import org.bukkit.event.Event;
 
 public abstract class BaseUserEvent extends Event {
 
+    public BaseUserEvent(User user, boolean isAsync) {
+        super(isAsync);
+        this.user = user;
+    }
+
     public BaseUserEvent(User user) {
         this.user = user;
     }

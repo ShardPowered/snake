@@ -108,7 +108,7 @@ public class User {
                 .collect(Collectors.toMap(Function.identity(), achievementDoc::getLong));
 
         addToSaveQueue(UserKey.UUID, uuid.toString());
-
+        
         // nickname and tag updated by UserRegistry#onPlayerJoin
     }
 

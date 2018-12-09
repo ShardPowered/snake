@@ -28,9 +28,11 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.val;
 import me.tassu.easy.register.command.Aliases;
+import me.tassu.snake.cmd.meta.UserTargetingCommand;
+import me.tassu.snake.user.User;
 import me.tassu.snake.util.LocaleConfig;
 import me.tassu.snake.cmd.meta.Message;
-import me.tassu.snake.cmd.meta.UserTargetingCommand;
+import me.tassu.snake.cmd.meta.PlayerTargetingCommand;
 import me.tassu.snake.user.UserRegistry;
 import me.tassu.snake.user.rank.Rank;
 import me.tassu.snake.user.rank.RankConfig;
@@ -47,9 +49,6 @@ import java.util.stream.Collectors;
 public class SetRankCommand extends UserTargetingCommand {
 
     @Inject
-    private UserRegistry registry;
-
-    @Inject
     private RankConfig rankConfig;
 
     @Inject
@@ -64,14 +63,14 @@ public class SetRankCommand extends UserTargetingCommand {
     }
 
     @Override
-    public void run(Player player) {
+    public void run(User user) {
         val rank = rankConfig.byName(getArguments().get(0));
-        registry.get(player).setRank(rank);
+        user.setRank(rank);
     }
 
     @Override
-    protected Object[] getPlaceholders(Set<Player> target) {
-        return new Object[] {rankConfig.byName(getArguments().get(0)).getName(), nameOrCount(target)};
+    protected Object[] getPlaceholders(Set<User> target) {
+        return new Object[] {rankConfig.byName(getArguments().get(0)).getName(), nameOrCountUsers(target)};
     }
 
     @Override
@@ -83,8 +82,8 @@ public class SetRankCommand extends UserTargetingCommand {
     public List<String> tabComplete(CommandSender sender, String alias, String[] args) throws IllegalArgumentException {
         if (args.length == 2) {
             return rankConfig.getRanks().stream()
-                    .filter(rank -> StringUtil.startsWithIgnoreCase(rank.getName(), args[1]))
                     .map(Rank::getName)
+                    .filter(rank -> StringUtil.startsWithIgnoreCase(rank, args[1]))
                     .sorted(String.CASE_INSENSITIVE_ORDER)
                     .collect(Collectors.toList());
         }

@@ -28,13 +28,13 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import me.tassu.easy.register.command.Aliases;
 import me.tassu.snake.cmd.meta.Message;
-import me.tassu.snake.cmd.meta.UserTargetingCommand;
+import me.tassu.snake.cmd.meta.PlayerTargetingCommand;
 import me.tassu.snake.util.LocaleConfig;
 import org.bukkit.entity.Player;
 
 @Singleton
 @Aliases({"fly", "flight"})
-public class FlyCommand extends UserTargetingCommand {
+public class FlyCommand extends PlayerTargetingCommand {
 
     @Inject
     private LocaleConfig locale;

@@ -31,7 +31,7 @@ import me.tassu.easy.register.command.Aliases;
 import me.tassu.easy.register.command.error.CommandException;
 import me.tassu.snake.util.LocaleConfig;
 import me.tassu.snake.cmd.meta.Message;
-import me.tassu.snake.cmd.meta.UserTargetingCommand;
+import me.tassu.snake.cmd.meta.PlayerTargetingCommand;
 import me.tassu.snake.cmd.meta.ex.UsageException;
 import org.bukkit.GameMode;
 import org.bukkit.command.CommandSender;
@@ -46,7 +46,7 @@ import java.util.stream.Collectors;
 
 @Singleton
 @Aliases({"gamemode", "gm"})
-public class GameModeCommand extends UserTargetingCommand {
+public class GameModeCommand extends PlayerTargetingCommand {
 
     @Inject
     private LocaleConfig locale;

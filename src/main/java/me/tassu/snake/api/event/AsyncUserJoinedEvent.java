@@ -22,27 +22,26 @@
  * SOFTWARE.
  */
 
-package me.tassu.snake.cmd.staff;
+package me.tassu.snake.api.event;
 
-import com.google.inject.Singleton;
-import me.tassu.easy.register.command.Aliases;
-import me.tassu.snake.cmd.meta.PlayerTargetingCommand;
-import org.bukkit.attribute.Attribute;
-import org.bukkit.entity.Player;
+import me.tassu.snake.user.User;
+import org.bukkit.event.HandlerList;
 
-@Singleton
-@Aliases({"heal", "hp", "life"})
-public class HealCommand extends PlayerTargetingCommand {
+public class AsyncUserJoinedEvent extends BaseUserEvent {
 
-    public HealCommand() {
-        super("heal");
-        this.defaultToSelf();
-        this.setUsage("/heal [users=self]");
-        this.setDescription("Used to heal a player.");
+    public AsyncUserJoinedEvent(User user) {
+        super(user, true);
     }
+
+    private static final HandlerList handlers = new HandlerList();
 
     @Override
-    public void run(Player player) {
-        player.setHealth(player.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue());
+    public HandlerList getHandlers() {
+        return handlers;
     }
+
+    public static HandlerList getHandlerList() {
+        return handlers;
+    }
+
 }

@@ -25,11 +25,11 @@
 package me.tassu.snake.cmd.meta;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Lists;
 import com.google.inject.Inject;
 import lombok.val;
 import me.tassu.easy.register.command.error.CommandException;
 import me.tassu.snake.cmd.meta.ex.UsageException;
-import me.tassu.snake.user.User;
 import me.tassu.snake.user.UserParser;
 import me.tassu.snake.user.UserRegistry;
 import me.tassu.snake.util.LocaleConfig;
@@ -41,28 +41,31 @@ import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.util.StringUtil;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-public abstract class UserTargetingCommand extends BaseCommand {
-    public UserTargetingCommand(String name) {
-        super(name);
-    }
+public abstract class PlayerTargetingCommand extends BaseCommand {
 
+    private boolean defaultToSelf = false;
     private boolean useArguments = false;
     private int requireArguments = 0;
 
     @SuppressWarnings("WeakerAccess")
-    public UserTargetingCommand useArguments() {
+    public PlayerTargetingCommand defaultToSelf() {
+        this.defaultToSelf = true;
+        return this;
+    }
+
+    @SuppressWarnings("WeakerAccess")
+    public PlayerTargetingCommand useArguments() {
         this.useArguments = true;
         return this;
     }
 
     @SuppressWarnings({"UnusedReturnValue", "WeakerAccess"})
-    public UserTargetingCommand requireArguments(int requireArguments) {
+    public PlayerTargetingCommand requireArguments(int requireArguments) {
         this.requireArguments = requireArguments;
         return useArguments();
     }
@@ -86,50 +89,71 @@ public abstract class UserTargetingCommand extends BaseCommand {
     @Inject
     private LocaleConfig locale;
 
+    public PlayerTargetingCommand(String name) {
+        super(name);
+    }
+
     @Override
-    protected void run(CommandSender sender, String label, List<String> args) {
-        val requiredArgs = 1 + requireArguments;
-
-        if (args.size() < requiredArgs) {
-            sendMessage(sender, locale.getLocale().getUsageMessage(), getUsage());
-            return;
-        }
-
-        try {
-            if (useArguments) {
-                arguments = ArrayUtil.withoutFirst(args);
-            }
-
-            val target = registry.get(args.get(0)).orElse(null);
-
-            if (target != null) {
-                try {
-                    run(target);
-                } catch (CommandException e) {
-                    arguments = null;
+    public final void run(CommandSender sender, String label, List<String> args) throws CommandException {
+        if (args.isEmpty() && useArguments && defaultToSelf && sender instanceof Player && requireArguments == 0) {
+            arguments = Lists.newArrayList();
+            args = Lists.newArrayList(sender.getName());
+        } else {
+            if (args.isEmpty()) {
+                if (!useArguments && sender instanceof Player) {
+                    args = Lists.newArrayList(sender.getName());
+                } else {
                     sendMessage(sender, locale.getLocale().getUsageMessage(), getUsage());
                     return;
                 }
             }
 
-            val success = target == null ? Collections.<User>emptySet() : Collections.singleton(target);
-            sendSuccessMessage(sender, success);
+            if (useArguments) {
+                arguments = ArrayUtil.withoutFirst(args);
+
+                if (arguments.size() < requireArguments) {
+                    if (arguments.size() + 1 >= requireArguments && defaultToSelf && sender instanceof Player) {
+                        arguments = args;
+                        args = Lists.newArrayList(sender.getName());
+                    } else {
+                        arguments = null;
+                        sendMessage(sender, locale.getLocale().getUsageMessage(), getUsage());
+                        return;
+                    }
+                }
+            }
+        }
+
+        try {
+            val target = parser.select(args.get(0), sender instanceof Player ? ((Player) sender) : null);
+
+            try {
+                for (Player player : target) {
+                    run(player);
+                }
+            } catch (UsageException e) {
+                arguments = null;
+                sendMessage(sender, locale.getLocale().getUsageMessage(), getUsage());
+                return;
+            }
+
+            sendSuccessMessage(sender, target);
         } finally {
             arguments = null;
         }
     }
 
-    public abstract void run(User user) throws CommandException;
+    public abstract void run(Player player) throws CommandException;
 
     protected Message getMessage() {
         return locale.getLocale().getEntityAffectSuccess();
     }
 
-    protected Object[] getPlaceholders(Set<User> target) {
-        return new Object[] {nameOrCountUsers(target)};
+    protected Object[] getPlaceholders(Set<Player> target) {
+        return new Object[] {nameOrCount(target)};
     }
 
-    protected void sendSuccessMessage(CommandSender sender, Set<User> target) {
+    protected void sendSuccessMessage(CommandSender sender, Set<Player> target) {
         sendMessage(sender, getMessage().getSelf(), getPlaceholders(target));
 
         val others = getMessage().getOthers(sender, registry);
@@ -170,5 +194,4 @@ public abstract class UserTargetingCommand extends BaseCommand {
     public final List<String> tabComplete(CommandSender sender, String alias, String[] args, Location location) throws IllegalArgumentException {
         return tabComplete(sender, alias, args);
     }
-
 }

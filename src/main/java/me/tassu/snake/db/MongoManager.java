@@ -73,38 +73,41 @@ public class MongoManager implements IRegistrable {
 
     @Override
     public void register() {
-        close();
+        try {
+            close();
 
-        val credential = MongoCredential.createCredential(config.getUsername(), config.getDatabase(), config.getPassword().toCharArray());
-        val settings = MongoClientSettings.builder()
-                .credential(credential)
-                .applyToSslSettings(builder -> builder.enabled(config.isUseSSL()))
-                .applyToClusterSettings(builder ->
-                        builder.hosts(Collections.singletonList(new ServerAddress(config.getHost(), config.getPort()))))
-                .applyToServerSettings(builder -> builder.addServerMonitorListener(new ServerMonitorListener() {
-                    @Override
-                    public void serverHearbeatStarted(ServerHeartbeatStartedEvent event) {}
+            val credential = MongoCredential.createCredential(config.getUsername(), config.getAuthDatabase(), config.getPassword().toCharArray());
+            val settings = MongoClientSettings.builder()
+                    .applyToSslSettings(builder -> builder.enabled(config.isUseSSL()))
+                    .applyToClusterSettings(builder ->
+                            builder.hosts(Collections.singletonList(new ServerAddress(config.getHost(), config.getPort()))))
+                    .applyToServerSettings(builder -> builder.addServerMonitorListener(new ServerMonitorListener() {
+                        @Override
+                        public void serverHearbeatStarted(ServerHeartbeatStartedEvent event) {}
 
-                    @Override
-                    public void serverHeartbeatSucceeded(ServerHeartbeatSucceededEvent event) {
-                        if (!connected) {
-                            log.info("Connected to MongoDB.");
+                        @Override
+                        public void serverHeartbeatSucceeded(ServerHeartbeatSucceededEvent event) {
+                            if (!connected) {
+                                log.info("Connected to MongoDB.");
+                            }
+
+                            connected = true;
                         }
 
-                        connected = true;
-                    }
+                        @Override
+                        public void serverHeartbeatFailed(ServerHeartbeatFailedEvent event) {
+                            connected = false;
 
-                    @Override
-                    public void serverHeartbeatFailed(ServerHeartbeatFailedEvent event) {
-                        connected = false;
+                            Bukkit.getScheduler().runTask(plugin, () -> Bukkit.getOnlinePlayers().forEach(it -> it.kickPlayer(KICK_MESSAGE)));
+                            log.error("MongoDB connection dropped", event.getThrowable());
+                        }
+                    }));
 
-                        Bukkit.getScheduler().runTask(plugin, () -> Bukkit.getOnlinePlayers().forEach(it -> it.kickPlayer(KICK_MESSAGE)));
-                        log.error("MongoDB connection dropped", event.getThrowable());
-                    }
-                }))
-                .build();
-        try {
-            client = MongoClients.create(settings);
+            if (config.isUseAuth()) {
+                settings.credential(credential);
+            }
+
+            client = MongoClients.create(settings.build());
         } catch (MongoException ex) {
             connected = false;
 

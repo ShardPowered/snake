@@ -30,6 +30,7 @@ import me.tassu.easy.log.Log;
 import me.tassu.easy.register.command.Command;
 import me.tassu.easy.register.command.error.CommandException;
 import me.tassu.easy.register.command.error.MissingPermissionException;
+import me.tassu.snake.user.User;
 import me.tassu.snake.user.UserRegistry;
 import me.tassu.snake.user.rank.Rank;
 import me.tassu.snake.user.rank.RankConfig;
@@ -104,6 +105,15 @@ public abstract class BaseCommand extends Command {
         }
 
         return input.size() + " " + (input.stream().allMatch(Player.class::isInstance) ? "players" : "entities");
+    }
+
+    protected String nameOrCountUsers(Set<User> input) {
+        if (input.size() == 1) {
+            val first = input.stream().findFirst().get();
+            return first.getPrefixedName();
+        }
+
+        return input.size() + " users";
     }
 
 }

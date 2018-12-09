@@ -33,6 +33,8 @@ import lombok.val;
 import me.tassu.easy.log.Log;
 import me.tassu.easy.register.core.IRegistrable;
 import me.tassu.simple.TaskChainModule;
+import me.tassu.snake.api.event.AsyncUserJoinedEvent;
+import me.tassu.snake.api.event.SyncUserJoinedEvent;
 import me.tassu.snake.db.MongoManager;
 import me.tassu.snake.user.level.ExperienceUtil;
 import me.tassu.snake.user.rank.RankConfig;
@@ -76,6 +78,29 @@ public class UserRegistry implements IRegistrable {
 
     public void release(UUID uuid) {
         locked.remove(uuid);
+    }
+
+    public Optional<User> get(String lastName) {
+        val existing = users.values()
+                .stream()
+                .filter(it -> it.getUserName().equalsIgnoreCase(lastName))
+                .findFirst();
+
+        if (existing.isPresent()) {
+            return existing;
+        }
+
+        var document = mongo.getDatabase().getCollection(UserKey.COLLECTION)
+                .find(eq(UserKey.NICKNAME, lastName))
+                .first();
+
+        if (document == null) {
+            return Optional.empty();
+        }
+
+        val user = new User(UUID.fromString(document.getString(UserKey.UUID)), document, config, experienceUtil);
+        users.put(user.getUuid(), user);
+        return Optional.of(user);
     }
 
     public User get(UUID uuid) {
@@ -150,9 +175,16 @@ public class UserRegistry implements IRegistrable {
                 .newChain()
                 .delay(5)
                 .asyncFirst(() -> get(event.getPlayer()))
+                .async(user -> {
+                    Bukkit.getPluginManager().callEvent(new AsyncUserJoinedEvent(user));
+
+                    return user;
+                })
                 .syncLast(user -> {
                     user.setNickname(event.getPlayer().getName());
                     user.updateTag();
+
+                    Bukkit.getPluginManager().callEvent(new SyncUserJoinedEvent(user));
                 }).execute();
     }
 

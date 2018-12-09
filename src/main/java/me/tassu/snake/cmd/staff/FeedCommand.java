@@ -26,12 +26,12 @@ package me.tassu.snake.cmd.staff;
 
 import com.google.inject.Singleton;
 import me.tassu.easy.register.command.Aliases;
-import me.tassu.snake.cmd.meta.UserTargetingCommand;
+import me.tassu.snake.cmd.meta.PlayerTargetingCommand;
 import org.bukkit.entity.Player;
 
 @Singleton
 @Aliases({"feed", "eat"})
-public class FeedCommand extends UserTargetingCommand {
+public class FeedCommand extends PlayerTargetingCommand {
 
     public FeedCommand() {
         super("feed");
