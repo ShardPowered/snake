@@ -26,14 +26,13 @@ package me.tassu.snake.user;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.HashMultimap;
-import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.val;
+import me.tassu.snake.achievement.Achievement;
 import me.tassu.snake.api.event.PostUserAchievementGainEvent;
 import me.tassu.snake.api.event.PostUserExperienceGainEvent;
-import me.tassu.snake.achievement.Achievement;
 import me.tassu.snake.api.event.PostUserLevelUpEvent;
 import me.tassu.snake.user.level.ExperienceUtil;
 import me.tassu.snake.user.level.LevelUtil;
@@ -44,7 +43,10 @@ import org.bson.Document;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
+import java.util.UUID;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -53,6 +55,9 @@ public class User {
 
     @Getter(AccessLevel.NONE)
     private ExperienceUtil experienceUtil;
+
+    @Getter(AccessLevel.NONE)
+    private RankConfig rankConfig;
 
     @Getter(AccessLevel.PACKAGE)
     private Multimap<String, Object> setSaveQueue = HashMultimap.create();
@@ -86,13 +91,14 @@ public class User {
         return LevelUtil.getProgress(totalExperience, getLevel());
     }
 
-    User(UUID uuid, Document document, RankConfig config, ExperienceUtil experienceUtil) {
+    User(UUID uuid, Document document, RankConfig rankConfig, ExperienceUtil experienceUtil) {
         Preconditions.checkNotNull(uuid);
 
         this.experienceUtil = experienceUtil;
+        this.rankConfig = rankConfig;
 
         this.uuid = uuid;
-        this.rank = config.byName(document.getString(UserKey.RANK));
+        this.rank = rankConfig.byName(document.getString(UserKey.RANK));
 
         val firstJoin = document.getLong(UserKey.FIRST_JOIN);
         this.firstJoin = firstJoin == null ? System.currentTimeMillis() : firstJoin;
@@ -108,7 +114,7 @@ public class User {
                 .collect(Collectors.toMap(Function.identity(), achievementDoc::getLong));
 
         addToSaveQueue(UserKey.UUID, uuid.toString());
-        
+
         // nickname and tag updated by UserRegistry#onPlayerJoin
     }
 

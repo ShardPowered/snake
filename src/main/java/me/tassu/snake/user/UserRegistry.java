@@ -81,6 +81,10 @@ public class UserRegistry implements IRegistrable {
     }
 
     public Optional<User> get(String lastName) {
+        if (lastName.matches("[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}")) {
+            return Optional.ofNullable(get(UUID.fromString(lastName)));
+        }
+
         val existing = users.values()
                 .stream()
                 .filter(it -> it.getUserName().equalsIgnoreCase(lastName))
@@ -175,17 +179,18 @@ public class UserRegistry implements IRegistrable {
                 .newChain()
                 .delay(5)
                 .asyncFirst(() -> get(event.getPlayer()))
-                .async(user -> {
-                    Bukkit.getPluginManager().callEvent(new AsyncUserJoinedEvent(user));
-
-                    return user;
-                })
-                .syncLast(user -> {
+                .sync(user -> {
                     user.setNickname(event.getPlayer().getName());
                     user.updateTag();
 
                     Bukkit.getPluginManager().callEvent(new SyncUserJoinedEvent(user));
-                }).execute();
+
+                    return user;
+                })
+                .asyncLast(user -> {
+                    Bukkit.getPluginManager().callEvent(new AsyncUserJoinedEvent(user));
+                })
+                .execute();
     }
 
     public void cleanup() {

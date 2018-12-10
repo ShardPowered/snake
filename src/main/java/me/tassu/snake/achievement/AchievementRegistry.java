@@ -24,6 +24,7 @@
 
 package me.tassu.snake.achievement;
 
+import com.google.common.base.MoreObjects;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Maps;
 import com.google.inject.Inject;
@@ -159,6 +160,16 @@ public class AchievementRegistry implements IRegistrable {
             }
 
             return false;
+        }
+
+        @Override
+        public String toString() {
+            return MoreObjects.toStringHelper(this)
+                    .add("name", name)
+                    .add("id", id)
+                    .add("description", description)
+                    .add("experienceReward", experienceReward)
+                    .toString();
         }
     }
 

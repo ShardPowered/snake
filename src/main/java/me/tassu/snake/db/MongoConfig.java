@@ -34,28 +34,10 @@ import ninja.leaping.configurate.objectmapping.Setting;
 @Config.Name("mongo")
 public class MongoConfig extends Config<MongoConfig> {
 
-    @Setting("use-auth")
-    private boolean useAuth = false;
-
     @Setting
-    private String host = "localhost";
-
-    @Setting
-    private int port = 27017;
-
-    @Setting
-    private String username = "root";
-
-    @Setting
-    private String password = "password";
-
-    @Setting("auth-database")
-    private String authDatabase = "admin";
+    private String uri = "mongodb://mongo";
 
     @Setting
     private String database = "minecraft";
-
-    @Setting("use-ssl")
-    private boolean useSSL = false;
 
 }

@@ -90,8 +90,8 @@ public final class SnakePlugin extends EasyPlugin {
                 RankConfig.class,
                 ChatConfig.class,
 
-                AchievementListener.class,
                 StandardAchievements.class,
+                AchievementListener.class,
 
                 NoPrefixedCommand.class,
                 ChatFormatter.class,
