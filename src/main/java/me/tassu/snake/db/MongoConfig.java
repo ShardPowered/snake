@@ -35,7 +35,7 @@ import ninja.leaping.configurate.objectmapping.Setting;
 public class MongoConfig extends Config<MongoConfig> {
 
     @Setting
-    private String uri = "mongodb://mongo";
+    private String uri = "mongodb://mongo,mongo2,mongo3/rs=mc-rs-1";
 
     @Setting
     private String database = "minecraft";

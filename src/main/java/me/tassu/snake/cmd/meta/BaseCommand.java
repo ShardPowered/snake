@@ -63,7 +63,7 @@ public abstract class BaseCommand extends Command {
         }
 
         if (!rankConfig.matchByName(commandConfig.getRequiredRanks().get(getName())).isPresent()) {
-            log.error("Invalid rank for command {0}: {1}. Command will not work.",
+            log.error("Invalid rank for command {}: {}. Command will not work.",
                     getName(), commandConfig.getRequiredRanks().get(getName()));
             return;
         }
