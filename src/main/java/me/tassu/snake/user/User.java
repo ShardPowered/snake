@@ -115,7 +115,10 @@ public class User {
 
         addToSaveQueue(UserKey.UUID, uuid.toString());
 
-        // nickname and tag updated by UserRegistry#onPlayerJoin
+        getPlayer().ifPresent(player -> {
+            setNickname(player.getName());
+            updateTag();
+        });
     }
 
     @SuppressWarnings({"UnusedReturnValue", "WeakerAccess"})

@@ -30,6 +30,7 @@ import org.bson.Document;
 import org.bukkit.ChatColor;
 
 @Getter
+@Setter
 @EqualsAndHashCode
 @AllArgsConstructor
 public class Rank {
@@ -39,11 +40,16 @@ public class Rank {
     @Getter(AccessLevel.NONE)
     private String nickname;
 
-    private int weight;
-    private ChatColor primary;
-    private ChatColor secondary;
+    private int weight = 0;
+    private ChatColor primary = ChatColor.DARK_GRAY;
+    private ChatColor secondary = ChatColor.GRAY;
     private boolean isDefault = false;
     private TablistMode tablistMode = TablistMode.SHOW_COLOR;
+
+    public Rank(String name, int weight) {
+        this.name = name;
+        this.weight = weight;
+    }
 
     private Rank(String name) {
         this.name = name;

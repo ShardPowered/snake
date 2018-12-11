@@ -180,11 +180,7 @@ public class UserRegistry implements IRegistrable {
                 .delay(5)
                 .asyncFirst(() -> get(event.getPlayer()))
                 .sync(user -> {
-                    user.setNickname(event.getPlayer().getName());
-                    user.updateTag();
-
                     Bukkit.getPluginManager().callEvent(new SyncUserJoinedEvent(user));
-
                     return user;
                 })
                 .asyncLast(user -> {

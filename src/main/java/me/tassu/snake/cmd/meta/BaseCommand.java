@@ -35,7 +35,9 @@ import me.tassu.snake.user.UserRegistry;
 import me.tassu.snake.user.rank.Rank;
 import me.tassu.snake.user.rank.RankRegistry;
 import me.tassu.snake.util.Chat;
+import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
+import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 
@@ -114,6 +116,21 @@ public abstract class BaseCommand extends Command {
         }
 
         return input.size() + " users";
+    }
+
+    protected void sendSuccessMessage(CommandSender sender, Message message, Object... placeholders) {
+        sendMessage(sender, message.getSelf(), placeholders);
+
+        val others = message.getOthers(sender, registry);
+
+        if (!(sender instanceof ConsoleCommandSender)) {
+            sendMessage(Bukkit.getConsoleSender(), others, placeholders);
+        }
+
+        Bukkit.getOnlinePlayers().stream()
+                .filter(it -> it != sender)
+                .filter(it -> registry.get(it).getRank().getWeight() >= getRequiredRank().getWeight())
+                .forEach(it -> sendMessage(it, others, placeholders));
     }
 
 }

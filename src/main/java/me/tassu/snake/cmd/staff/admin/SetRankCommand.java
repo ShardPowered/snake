@@ -78,7 +78,7 @@ public class SetRankCommand extends UserTargetingCommand {
     @Override
     public List<String> tabComplete(CommandSender sender, String alias, String[] args) throws IllegalArgumentException {
         if (args.length == 2) {
-            return rankRegistry.getRanks().stream()
+            return rankRegistry.getRanks().values().stream()
                     .map(Rank::getName)
                     .filter(rank -> StringUtil.startsWithIgnoreCase(rank, args[1]))
                     .sorted(String.CASE_INSENSITIVE_ORDER)
