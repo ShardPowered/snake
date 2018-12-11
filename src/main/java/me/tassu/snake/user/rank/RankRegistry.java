@@ -68,6 +68,7 @@ public class RankRegistry implements IRegistrable {
         if (ranks.isEmpty()) {
             log.debug("Creating default ranks");
             addRank(new Rank("DEFAULT", "Member", 0, ChatColor.GRAY, ChatColor.GRAY, true, Rank.TablistMode.SHOW_COLOR));
+            addRank(new Rank("MODERATOR", "Moderator", 25, ChatColor.DARK_GREEN, ChatColor.GREEN, true, Rank.TablistMode.SHOW_COLOR));
             addRank(new Rank("ADMIN", "Admin", 250, ChatColor.DARK_RED, ChatColor.RED, false, Rank.TablistMode.SHOW_COLOR));
         }
     }
