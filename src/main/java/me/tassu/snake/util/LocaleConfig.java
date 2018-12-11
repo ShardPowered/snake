@@ -86,11 +86,51 @@ public class LocaleConfig extends Config<LocaleConfig> {
 
         // admin commands
 
-        @Setting("gamemode-set")
-        private Message gamemodeSetMessage = of(Chat.YELLOW, "Set game mode ''{0}'' to {1}" + Chat.YELLOW + ".");
+        /// rankadmin
+
+        @Setting("rank-admin-help")
+        private List<String> rankAdminHelp = Lists.newArrayList("",
+                Chat.YELLOW + "Help for " + Chat.BOLD + "/rankadmin",
+                "",
+                Chat.GRAY + "/rankadmin list" + Chat.ITALIC + " (used to list all ranks)",
+                Chat.GRAY + "/rankadmin create " + Chat.WHITE + "[name] [weight=0]" + Chat.GRAY + Chat.ITALIC + " (used to list all ranks)",
+                Chat.GRAY + "/rankadmin edit " + Chat.WHITE + "[rank] "
+                        + "[display|weight|primary|secondary|tab] [value]" + Chat.GRAY + Chat.ITALIC + " (used to modify a rank)",
+                Chat.GRAY + "/rankadmin delete " + Chat.WHITE + "[name]" + Chat.GRAY + Chat.ITALIC + " (used to delete a rank)",
+                ""
+        );
+
+        @Setting("rank-admin-list-header")
+        private String rankAdminListHeader = Chat.YELLOW + "Listing all ranks:";
+
+        @Setting("rank-admin-list-entry")
+        private String rankAdminListEntry = Chat.YELLOW + "= {0}{1}" + Chat.YELLOW + " ({2}" + Chat.RESET + ", {3})";
+
+        @Setting("rank-admin-rank-already-exists")
+        private String rankAdminRankAlreadyExists = Chat.YELLOW + "A rank by that name already exists.";
+
+        @Setting("rank-admin-invalid-name")
+        private String rankAdminInvalidName = Chat.YELLOW + "Rank name may only contain letters, numbers or dashes.";
+
+        @Setting("rank-admin-delete-default")
+        private String rankAdminDeleteDefault = Chat.YELLOW + "You may not delete the default rank.";
+
+        @Setting("rank-admin-created-rank")
+        private Message rankAdminRankCreated = of(Chat.YELLOW, "Created rank ''{0}''" + Chat.YELLOW + ".");
+
+        @Setting("rank-admin-deleted-rank")
+        private Message rankAdminRankDeleted = of(Chat.YELLOW, "Deleted rank ''{0}''" + Chat.YELLOW + ".");
+
+        @Setting("rank-admin-modified-rank")
+        private Message rankAdminRankModified = of(Chat.YELLOW, "Modified rank ''{0}''" + Chat.YELLOW + ": set {1} to {2}" + Chat.YELLOW + ".");
+
+        /// others
 
         @Setting("rank-set")
         private Message setRankMessage = of(Chat.YELLOW, "Set rank ''{0}'' to {1}" + Chat.YELLOW + ".");
+
+        @Setting("gamemode-set")
+        private Message gamemodeSetMessage = of(Chat.YELLOW, "Set game mode ''{0}'' to {1}" + Chat.YELLOW + ".");
 
         @Setting("general-affected")
         private Message entityAffectSuccess = of(Chat.YELLOW, "Affected {0}" + Chat.YELLOW + ".");

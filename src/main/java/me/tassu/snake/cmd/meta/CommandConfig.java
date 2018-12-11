@@ -39,9 +39,10 @@ public class CommandConfig extends Config<CommandConfig> {
 
     @Setting("permissions")
     private Map<String, String> requiredRanks = ImmutableMap.<String, String>builder()
-            .put("help", "MEMBER")
-            .put("uptime", "MEMBER")
+            .put("help", "DEFAULT")
+            .put("uptime", "DEFAULT")
             .put("setrank", "ADMIN")
+            .put("rankadmin", "ADMIN")
             .put("gamemode", "ADMIN")
             .put("fly", "MODERATOR")
             .put("heal", "MODERATOR")

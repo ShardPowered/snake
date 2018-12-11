@@ -37,7 +37,7 @@ import me.tassu.snake.api.event.PostUserLevelUpEvent;
 import me.tassu.snake.user.level.ExperienceUtil;
 import me.tassu.snake.user.level.LevelUtil;
 import me.tassu.snake.user.rank.Rank;
-import me.tassu.snake.user.rank.RankConfig;
+import me.tassu.snake.user.rank.RankRegistry;
 import me.tassu.snake.util.BSONUtil;
 import org.bson.Document;
 import org.bukkit.Bukkit;
@@ -57,7 +57,7 @@ public class User {
     private ExperienceUtil experienceUtil;
 
     @Getter(AccessLevel.NONE)
-    private RankConfig rankConfig;
+    private RankRegistry rankRegistry;
 
     @Getter(AccessLevel.PACKAGE)
     private Multimap<String, Object> setSaveQueue = HashMultimap.create();
@@ -91,14 +91,14 @@ public class User {
         return LevelUtil.getProgress(totalExperience, getLevel());
     }
 
-    User(UUID uuid, Document document, RankConfig rankConfig, ExperienceUtil experienceUtil) {
+    User(UUID uuid, Document document, RankRegistry rankRegistry, ExperienceUtil experienceUtil) {
         Preconditions.checkNotNull(uuid);
 
         this.experienceUtil = experienceUtil;
-        this.rankConfig = rankConfig;
+        this.rankRegistry = rankRegistry;
 
         this.uuid = uuid;
-        this.rank = rankConfig.byName(document.getString(UserKey.RANK));
+        this.rank = rankRegistry.byName(document.getString(UserKey.RANK));
 
         val firstJoin = document.getLong(UserKey.FIRST_JOIN);
         this.firstJoin = firstJoin == null ? System.currentTimeMillis() : firstJoin;
@@ -115,7 +115,10 @@ public class User {
 
         addToSaveQueue(UserKey.UUID, uuid.toString());
 
-        // nickname and tag updated by UserRegistry#onPlayerJoin
+        getPlayer().ifPresent(player -> {
+            setNickname(player.getName());
+            updateTag();
+        });
     }
 
     @SuppressWarnings({"UnusedReturnValue", "WeakerAccess"})
@@ -192,7 +195,7 @@ public class User {
     }
 
     public Optional<Player> getPlayer() {
-        // update nickname
+        // updateFrom nickname
         val player = Optional.ofNullable(Bukkit.getPlayer(this.uuid));
         player.ifPresent(it -> setNickname(it.getName()));
 
