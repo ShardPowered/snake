@@ -37,7 +37,7 @@ import me.tassu.snake.api.event.AsyncUserJoinedEvent;
 import me.tassu.snake.api.event.SyncUserJoinedEvent;
 import me.tassu.snake.db.MongoManager;
 import me.tassu.snake.user.level.ExperienceUtil;
-import me.tassu.snake.user.rank.RankConfig;
+import me.tassu.snake.user.rank.RankRegistry;
 import org.bson.Document;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -55,7 +55,7 @@ public class UserRegistry implements IRegistrable {
     private static final UpdateOptions SAVE_OPTIONS = new UpdateOptions().upsert(true);
 
     @Inject
-    private RankConfig config;
+    private RankRegistry config;
 
     @Inject
     private TaskChainModule chain;

@@ -33,7 +33,7 @@ import me.tassu.easy.register.command.error.MissingPermissionException;
 import me.tassu.snake.user.User;
 import me.tassu.snake.user.UserRegistry;
 import me.tassu.snake.user.rank.Rank;
-import me.tassu.snake.user.rank.RankConfig;
+import me.tassu.snake.user.rank.RankRegistry;
 import me.tassu.snake.util.Chat;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Entity;
@@ -47,7 +47,7 @@ public abstract class BaseCommand extends Command {
     @Inject private Log log;
 
     @Inject private CommandConfig commandConfig;
-    @Inject private RankConfig rankConfig;
+    @Inject private RankRegistry rankRegistry;
 
     @Inject private UserRegistry registry;
 
@@ -62,7 +62,7 @@ public abstract class BaseCommand extends Command {
             return;
         }
 
-        if (!rankConfig.matchByName(commandConfig.getRequiredRanks().get(getName())).isPresent()) {
+        if (!rankRegistry.matchByName(commandConfig.getRequiredRanks().get(getName())).isPresent()) {
             log.error("Invalid rank for command {0}: {1}. Command will not work.",
                     getName(), commandConfig.getRequiredRanks().get(getName()));
             return;
@@ -85,7 +85,7 @@ public abstract class BaseCommand extends Command {
     }
 
     protected Rank getRequiredRank() {
-        return rankConfig.matchByName(commandConfig.getRequiredRanks().get(getName()))
+        return rankRegistry.matchByName(commandConfig.getRequiredRanks().get(getName()))
                 .orElseThrow(() -> new IllegalStateException("Illegal rank received for command " + getName()
                         + ": " + commandConfig.getRequiredRanks().get(getName())));
     }

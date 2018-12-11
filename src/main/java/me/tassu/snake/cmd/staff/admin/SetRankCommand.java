@@ -32,12 +32,9 @@ import me.tassu.snake.cmd.meta.UserTargetingCommand;
 import me.tassu.snake.user.User;
 import me.tassu.snake.util.LocaleConfig;
 import me.tassu.snake.cmd.meta.Message;
-import me.tassu.snake.cmd.meta.PlayerTargetingCommand;
-import me.tassu.snake.user.UserRegistry;
 import me.tassu.snake.user.rank.Rank;
-import me.tassu.snake.user.rank.RankConfig;
+import me.tassu.snake.user.rank.RankRegistry;
 import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
 import org.bukkit.util.StringUtil;
 
 import java.util.List;
@@ -49,7 +46,7 @@ import java.util.stream.Collectors;
 public class SetRankCommand extends UserTargetingCommand {
 
     @Inject
-    private RankConfig rankConfig;
+    private RankRegistry rankRegistry;
 
     @Inject
     private LocaleConfig locale;
@@ -64,13 +61,13 @@ public class SetRankCommand extends UserTargetingCommand {
 
     @Override
     public void run(User user) {
-        val rank = rankConfig.byName(getArguments().get(0));
+        val rank = rankRegistry.byName(getArguments().get(0));
         user.setRank(rank);
     }
 
     @Override
     protected Object[] getPlaceholders(Set<User> target) {
-        return new Object[] {rankConfig.byName(getArguments().get(0)).getName(), nameOrCountUsers(target)};
+        return new Object[] {rankRegistry.byName(getArguments().get(0)).getName(), nameOrCountUsers(target)};
     }
 
     @Override
@@ -81,7 +78,7 @@ public class SetRankCommand extends UserTargetingCommand {
     @Override
     public List<String> tabComplete(CommandSender sender, String alias, String[] args) throws IllegalArgumentException {
         if (args.length == 2) {
-            return rankConfig.getRanks().stream()
+            return rankRegistry.getRanks().stream()
                     .map(Rank::getName)
                     .filter(rank -> StringUtil.startsWithIgnoreCase(rank, args[1]))
                     .sorted(String.CASE_INSENSITIVE_ORDER)

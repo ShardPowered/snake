@@ -24,47 +24,29 @@
 
 package me.tassu.snake.user.rank;
 
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.RequiredArgsConstructor;
+import lombok.*;
 import me.tassu.snake.util.Chat;
-import ninja.leaping.configurate.objectmapping.Setting;
-import ninja.leaping.configurate.objectmapping.serialize.ConfigSerializable;
+import org.bson.Document;
 import org.bukkit.ChatColor;
 
 @Getter
-@NoArgsConstructor
-@ConfigSerializable
+@EqualsAndHashCode
+@AllArgsConstructor
 public class Rank {
 
-    @Setting
-    private String name;
+    private final String name;
 
-    @Setting
     @Getter(AccessLevel.NONE)
     private String nickname;
 
-    @Setting
     private int weight;
-
-    @Setting
     private ChatColor primary;
-
-    @Setting
     private ChatColor secondary;
-
-    @Setting
     private boolean isDefault = false;
-
-    @Setting(comment = "SHOW_PREFIX | SHOW_COLOR | NONE")
     private TablistMode tablistMode = TablistMode.SHOW_COLOR;
 
-    public Rank(String name, int weight, ChatColor primary, ChatColor secondary) {
+    private Rank(String name) {
         this.name = name;
-        this.weight = weight;
-        this.primary = primary;
-        this.secondary = secondary;
     }
 
     public String getTag() {
@@ -77,14 +59,41 @@ public class Rank {
         return nickname;
     }
 
-    Rank setDefault() {
-        this.isDefault = true;
-        return this;
+    public Document toDocument() {
+        return new Document()
+                .append("_id", this.getName())
+                .append("nickname", this.getNickname())
+                .append("weight", this.getWeight())
+                .append("primary", this.getPrimary().getChar())
+                .append("secondary", this.getSecondary().getChar())
+                .append("tabmode", this.getTablistMode().name())
+                .append("default", this.isDefault());
     }
 
-    Rank setNickname(String nickname) {
-        this.nickname = nickname;
-        return this;
+    public void updateFrom(Document document) {
+        this.weight = document.getInteger("weight");
+
+        val nickname = document.getString("nickname");
+        if (!nickname.equals(this.getName())) {
+            this.nickname = nickname;
+        }
+
+        this.primary = ChatColor.getByChar(document.getString("primary"));
+        this.secondary = ChatColor.getByChar(document.getString("secondary"));
+        this.isDefault = document.getBoolean("default");
+
+        try {
+            this.tablistMode = TablistMode.valueOf(document.getString("tabmode"));
+        } catch (IllegalArgumentException ex) {
+            this.tablistMode = TablistMode.SHOW_COLOR;
+        }
+        
+    }
+
+    public static Rank fromDocument(Document document) {
+        val rank = new Rank(document.getString("_id"));
+        rank.updateFrom(document);
+        return rank;
     }
 
     public enum TablistMode {

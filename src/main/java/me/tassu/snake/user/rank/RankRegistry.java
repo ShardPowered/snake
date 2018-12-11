@@ -24,69 +24,86 @@
 
 package me.tassu.snake.user.rank;
 
-import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.UpdateOptions;
-import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.val;
 import me.tassu.easy.log.Log;
-import me.tassu.easy.register.config.Config;
+import me.tassu.easy.register.core.IRegistrable;
 import me.tassu.snake.db.MongoManager;
-import ninja.leaping.configurate.objectmapping.ObjectMappingException;
-import ninja.leaping.configurate.objectmapping.Setting;
 import org.bson.Document;
 import org.bukkit.ChatColor;
 
-import java.io.IOException;
-import java.util.List;
+import java.util.Arrays;
 import java.util.Optional;
+import java.util.Set;
 
 import static com.mongodb.client.model.Filters.eq;
 
-@Getter
 @Singleton
-@Config.Name("ranks")
-public class RankConfig extends Config<RankConfig> {
+public class RankRegistry implements IRegistrable {
 
     @Inject
-    @Getter(AccessLevel.NONE)
     private Log log;
 
     @Inject
-    @Getter(AccessLevel.NONE)
     private MongoManager mongoManager;
 
-    @Setting
-    private List<Rank> ranks = Lists.newArrayList(
-            new Rank("MEMBER", 0, ChatColor.GRAY, ChatColor.GRAY).setDefault().setNickname("Member"),
-            new Rank("MODERATOR", 25, ChatColor.DARK_GREEN, ChatColor.GREEN).setNickname("Mod"),
-            new Rank("ADMIN", 150, ChatColor.DARK_RED, ChatColor.RED).setNickname("Admin")
-    );
+    private UpdateOptions SAVE_OPTIONS = new UpdateOptions().upsert(true);
+
+    @Getter
+    private Set<Rank> ranks = Sets.newHashSet();
+
+    private MongoCollection<Document> collection() {
+        return mongoManager.getDatabase().getCollection("ranks");
+    }
 
     @Override
-    public void load() throws IOException, ObjectMappingException {
-        super.load();
+    public void register() {
+        reloadRanks();
 
         if (ranks.isEmpty()) {
-            throw new RuntimeException("No ranks loaded.");
+            log.debug("Creating default ranks");
+            addRank(new Rank("DEFAULT", "Member", 0, ChatColor.GRAY, ChatColor.GRAY, true, Rank.TablistMode.SHOW_COLOR));
+            addRank(new Rank("ADMIN", "Admin", 250, ChatColor.DARK_RED, ChatColor.RED, false, Rank.TablistMode.SHOW_COLOR));
+        }
+    }
+
+    private void reloadRanks() {
+        val collection = collection();
+        val all = collection.find();
+
+        for (Document document : all) {
+            val id = document.getString("_id");
+            val current = matchByName(id);
+
+            if (current.isPresent()) {
+                current.get().updateFrom(document);
+            } else {
+                val rank = Rank.fromDocument(document);
+                ranks.add(rank);
+            }
+        }
+    }
+
+    private void addRank(Rank rank) {
+        val current = matchByName(rank.getName());
+
+        if (current.isPresent()) {
+            throw new IllegalArgumentException("Rank with specified name already exists.");
+        } else {
+            ranks.add(rank);
         }
 
-        val collection = mongoManager.getDatabase().getCollection("ranks");
-        val saveOptions = new UpdateOptions().upsert(true);
+        save(rank);
+    }
 
-        for (Rank rank : ranks) {
-            val document = new Document()
-                    .append("_id", rank.getName())
-                    .append("nickname", rank.getNickname())
-                    .append("weight", rank.getWeight())
-                    .append("primary", rank.getPrimary().getChar())
-                    .append("secondary", rank.getSecondary().getChar())
-                    .append("default", rank.isDefault());
-
-            collection.updateOne(eq("_id", rank.getName()), new Document("$set", document), saveOptions);
-        }
+    private void save(Rank rank) {
+        val collection = collection();
+        collection.updateOne(eq("_id", rank.getName()), new Document("$set", rank.toDocument()), SAVE_OPTIONS);
     }
 
     public Optional<Rank> matchByName(String name) {
@@ -101,10 +118,10 @@ public class RankConfig extends Config<RankConfig> {
      * Gets a rank by its name, defaults to if none match
      */
     public Rank byName(String name) {
-        if (name == null || name.isEmpty()) return ranks.get(0);
+        if (name == null || name.isEmpty()) return ranks.stream().findFirst().orElseThrow(() -> new IllegalStateException("no ranks found"));
 
         return matchByName(name)
-                .orElseGet(() -> ranks.get(0));
+                .orElseGet(() -> ranks.stream().findFirst()
+                        .orElseThrow(() -> new IllegalStateException("no ranks found")));
     }
-
 }

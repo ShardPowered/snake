@@ -53,7 +53,7 @@ import me.tassu.snake.db.MongoConfig;
 import me.tassu.snake.db.MongoManager;
 import me.tassu.snake.user.UserRegistry;
 import me.tassu.snake.user.UserSaver;
-import me.tassu.snake.user.rank.RankConfig;
+import me.tassu.snake.user.rank.RankRegistry;
 import me.tassu.snake.user.rank.RankUtil;
 import me.tassu.snake.util.Messager;
 
@@ -81,13 +81,14 @@ public final class SnakePlugin extends EasyPlugin {
                 UserSaver.class,
 
                 AchievementRegistry.class,
+                RankRegistry.class,
+
                 TaskChainModule.class,
                 ExperienceUtil.class,
                 RankUtil.class,
 
                 CommandConfig.class,
                 LocaleConfig.class,
-                RankConfig.class,
                 ChatConfig.class,
 
                 StandardAchievements.class,
