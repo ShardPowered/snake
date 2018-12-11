@@ -36,7 +36,9 @@ import me.tassu.snake.util.LocaleConfig;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 
+import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Singleton
 @Aliases({"rankadmin", "rank"})
@@ -64,9 +66,11 @@ public class RankCommand extends BaseCommand {
         switch (args.get(0).toLowerCase()) {
             case "list":
                 sendMessage(sender, locale.getLocale().getRankAdminListHeader());
-                for (Rank rank : rankRegistry.getRanks().values()) {
+                for (Rank rank : rankRegistry.getRanks().values().stream()
+                        .sorted(Comparator.comparingInt(Rank::getWeight).reversed())
+                        .collect(Collectors.toList())) {
                     sendMessage(sender, locale.getLocale().getRankAdminListEntry(),
-                            rank.getPrimary().toString(), rank.getName(), rank.getTag(), rank.getWeight());
+                            rank.getPrimary().toString(), rank.getName(), rank.getTag().trim(), rank.getWeight());
                 }
                 break;
             case "create":
@@ -76,7 +80,7 @@ public class RankCommand extends BaseCommand {
                 }
 
                 var name = args.get(1);
-                if (!name.matches("[a-zA-Z0-9\\-]+")) {
+                if (!name.matches("[A-Z0-9\\-]+")) {
                     sendMessage(sender, locale.getLocale().getRankAdminInvalidName());
                     return;
                 }

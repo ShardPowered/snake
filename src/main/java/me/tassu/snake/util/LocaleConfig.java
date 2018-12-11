@@ -104,13 +104,13 @@ public class LocaleConfig extends Config<LocaleConfig> {
         private String rankAdminListHeader = Chat.YELLOW + "Listing all ranks:";
 
         @Setting("rank-admin-list-entry")
-        private String rankAdminListEntry = Chat.YELLOW + "= {0}{1}" + Chat.YELLOW + " ({2}" + Chat.RESET + ", {3})";
+        private String rankAdminListEntry = Chat.YELLOW + "= {0}{1}" + Chat.YELLOW + " ({2}" + Chat.RESET + " ; {3})";
 
         @Setting("rank-admin-rank-already-exists")
         private String rankAdminRankAlreadyExists = Chat.YELLOW + "A rank by that name already exists.";
 
         @Setting("rank-admin-invalid-name")
-        private String rankAdminInvalidName = Chat.YELLOW + "Rank name may only contain letters, numbers or dashes.";
+        private String rankAdminInvalidName = Chat.YELLOW + "Rank name may only contain uppercase letters, numbers or dashes.";
 
         @Setting("rank-admin-delete-default")
         private String rankAdminDeleteDefault = Chat.YELLOW + "You may not delete the default rank.";

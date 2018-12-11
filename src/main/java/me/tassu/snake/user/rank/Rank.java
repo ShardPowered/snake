@@ -57,7 +57,7 @@ public class Rank {
 
     public String getTag() {
         if (isDefault()) return Chat.GRAY;
-        return primary.toString() + "[" + getNickname() + "] " + secondary.toString();
+        return primary.toString() + "[" + getNickname() + "]" + secondary.toString() + " ";
     }
 
     public String getNickname() {
