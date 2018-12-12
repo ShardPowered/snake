@@ -1,5 +1,5 @@
 # Snake
-[![License](https://img.shields.io/github/license/ShardPowered/snake.svg)](LICENSE)
+[![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 ![IRC: #shard @ esper](https://img.shields.io/badge/irc-%23shard%20%40%20irc.esper.net-ff69b4.svg)
 
 This repository contains the code of Snake, the general Paper server management utility and heart of the [Shard](https://github.com/ShardPowered) ecosystem.
