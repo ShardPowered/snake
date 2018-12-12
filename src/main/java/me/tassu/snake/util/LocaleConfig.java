@@ -92,6 +92,7 @@ public class LocaleConfig extends Config<LocaleConfig> {
         private List<String> rankAdminHelp = Lists.newArrayList("",
                 Chat.YELLOW + "Help for " + Chat.BOLD + "/rankadmin",
                 "",
+                Chat.GRAY + "/setrank " + Chat.WHITE + "[player] [rank]" + Chat.GRAY + Chat.ITALIC + " (used to set a player's rank)",
                 Chat.GRAY + "/rankadmin list" + Chat.ITALIC + " (used to list all ranks)",
                 Chat.GRAY + "/rankadmin create " + Chat.WHITE + "[name] [weight=0]" + Chat.GRAY + Chat.ITALIC + " (used to list all ranks)",
                 Chat.GRAY + "/rankadmin edit " + Chat.WHITE + "[rank] "
