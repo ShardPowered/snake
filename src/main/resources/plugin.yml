@@ -2,4 +2,9 @@ name: Snake
 main: me.tassu.snake.SnakePlugin
 version: ${pluginVersion}
 depend: [Easy]
+description: The general Paper server management utility and heart of the Shard ecosystem.
 api-version: 1.13
+authors:
+- Tassu
+- ShardPowered team
+website: https://shard.tassu.me/snake

@@ -27,6 +27,7 @@ package me.tassu.snake.cmd.meta;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import lombok.val;
+import me.tassu.snake.user.User;
 import me.tassu.snake.user.UserRegistry;
 import me.tassu.snake.util.LocaleConfig;
 import ninja.leaping.configurate.objectmapping.Setting;
@@ -61,14 +62,23 @@ public class Message {
     public String getOthers(CommandSender actor, UserRegistry userRegistry) {
         if (actor instanceof Player && actorMode != LocaleConfig.UserNameMode.NAME_ONLY) {
             val player = userRegistry.get((Player) actor);
-            switch (actorMode) {
-                case FULL:
-                    return others.replace("{ACTOR}", player.getPrefixedName());
-                case COLORED:
-                    return others.replace("{ACTOR}", player.getColoredName());
-            }
+            return others.replace("{ACTOR}", getUserName(player, actorMode));
         }
 
         return others.replace("{ACTOR}", actor.getName());
     }
+
+    public static String getUserName(User user, LocaleConfig.UserNameMode mode) {
+        switch (mode) {
+            case FULL:
+                return user.getPrefixedName();
+            case COLORED:
+                return user.getColoredName();
+            case NAME_ONLY:
+                return user.getUserName();
+        }
+
+        throw new IllegalArgumentException("mode == null");
+    }
+
 }
