@@ -24,10 +24,13 @@
 
 package me.tassu.snake.chat;
 
+import com.google.common.collect.ImmutableMap;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.experimental.var;
 import lombok.val;
 import me.tassu.easy.register.core.IRegistrable;
+import me.tassu.snake.cmd.meta.Message;
 import me.tassu.snake.user.UserRegistry;
 import org.bukkit.ChatColor;
 import org.bukkit.event.EventHandler;
@@ -35,6 +38,8 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 
 import java.text.MessageFormat;
+
+import static me.tassu.easy.util.StringUtil.color;
 
 @Singleton
 public class ChatFormatter implements IRegistrable {
@@ -48,10 +53,21 @@ public class ChatFormatter implements IRegistrable {
     @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGHEST)
     public void onAsyncPlayerChat(AsyncPlayerChatEvent event) {
         val sender = registry.get(event.getPlayer());
-        val message = MessageFormat.format(ChatColor.translateAlternateColorCodes(
-                '&', config.getFormat()), sender.getPrefixedName(), "%2$s")
-                .replace(event.getPlayer().getName(), "%1$s");
 
+        val variables = ImmutableMap.<String, String>builder()
+                .put("USER", Message.getUserName(sender, config.getNameMode()))
+                .put("LEVEL", String.valueOf(sender.getLevel()))
+                .put("MESSAGE", "%2$s")
+                .build();
+
+        var message = config.getFormat();
+
+        for (String key : variables.keySet()) {
+            message = message.replace("{{" + key + "}}", variables.get(key));
+        }
+
+        message = message.replace(event.getPlayer().getName(), "%1$s");
         event.setFormat(message);
     }
+
 }

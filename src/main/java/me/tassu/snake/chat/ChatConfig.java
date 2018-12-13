@@ -28,6 +28,7 @@ import com.google.inject.Singleton;
 import lombok.Getter;
 import me.tassu.easy.register.config.Config;
 import me.tassu.snake.util.Chat;
+import me.tassu.snake.util.LocaleConfig;
 import ninja.leaping.configurate.objectmapping.Setting;
 
 @Getter
@@ -35,7 +36,10 @@ import ninja.leaping.configurate.objectmapping.Setting;
 @Config.Name("chat")
 public class ChatConfig extends Config<ChatConfig> {
 
+    @Setting(comment = "FULL | COLORED | NAME_ONLY")
+    private LocaleConfig.UserNameMode nameMode = LocaleConfig.UserNameMode.FULL;
+
     @Setting
-    public String format = Chat.GREEN + "{0}" + Chat.RESET + " " + Chat.DARK_GRAY + Chat.SMALL_ARROWS_RIGHT + " " + Chat.WHITE + "{1}";
+    private String format = Chat.GRAY + "[{{LEVEL}}] " + Chat.GREEN + "{{USER}}" + Chat.RESET + " " + Chat.DARK_GRAY + Chat.SMALL_ARROWS_RIGHT + " " + Chat.WHITE + "{{MESSAGE}}";
 
 }
