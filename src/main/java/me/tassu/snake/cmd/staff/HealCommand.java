@@ -35,7 +35,7 @@ import org.bukkit.entity.Player;
 public class HealCommand extends PlayerTargetingCommand {
 
     public HealCommand() {
-        super("heal");
+        super("heal", 10);
         this.defaultToSelf();
         this.setUsage("/heal [users=self]");
         this.setDescription("Used to heal a player.");

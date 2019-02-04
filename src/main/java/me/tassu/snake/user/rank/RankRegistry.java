@@ -79,7 +79,6 @@ public class RankRegistry implements IRegistrable {
         reloadRanks();
 
         if (ranks.isEmpty()) {
-            log.debug("Creating default ranks");
             addRank(new Rank("DEFAULT", "Member", 0, ChatColor.GRAY, ChatColor.GRAY, true, Rank.TablistMode.SHOW_COLOR));
             addRank(new Rank("MODERATOR", "Moderator", 25, ChatColor.DARK_GREEN, ChatColor.GREEN, false, Rank.TablistMode.SHOW_COLOR));
             addRank(new Rank("ADMIN", "Admin", 250, ChatColor.DARK_RED, ChatColor.RED, false, Rank.TablistMode.SHOW_COLOR));
@@ -93,8 +92,6 @@ public class RankRegistry implements IRegistrable {
                         if (change.getOperationType() == OperationType.DELETE) {
                             val name = change.getDocumentKey().getString("_id").getValue();
                             ranks.remove(name);
-
-                            log.info("Removed rank {}.", name);
                             return;
                         }
 
@@ -108,8 +105,6 @@ public class RankRegistry implements IRegistrable {
                             val rank = Rank.fromDocument(document);
                             addRank(rank);
                         }
-
-                        log.info("Reloaded rank {}.", name);
                     });
         });
     }

@@ -52,7 +52,7 @@ public class SetRankCommand extends UserTargetingCommand {
     private LocaleConfig locale;
 
     public SetRankCommand() {
-        super("setrank");
+        super("setrank", 250);
         this.setUsage("/setrank <users> <rank>");
         this.setDescription("Used to set a rank for a player.");
 

@@ -30,6 +30,7 @@ import me.tassu.easy.log.Log;
 import me.tassu.easy.register.command.Command;
 import me.tassu.easy.register.command.error.CommandException;
 import me.tassu.easy.register.command.error.MissingPermissionException;
+import me.tassu.snake.perm.PermissionManager;
 import me.tassu.snake.user.User;
 import me.tassu.snake.user.UserRegistry;
 import me.tassu.snake.user.rank.Rank;
@@ -46,30 +47,23 @@ import java.util.Set;
 
 public abstract class BaseCommand extends Command {
 
-    @Inject private Log log;
-
-    @Inject private CommandConfig commandConfig;
-    @Inject private RankRegistry rankRegistry;
-
+    @Inject private PermissionManager permissionManager;
     @Inject private UserRegistry registry;
 
+    private final int defaultPermission;
+
     public BaseCommand(String name) {
+        this(name, 250);
+    }
+
+    public BaseCommand(String name, int defaultPermission) {
         super(name);
+        this.defaultPermission = defaultPermission;
     }
 
     @Override
     public void register() {
-        if (!commandConfig.getRequiredRanks().containsKey(getName())) {
-            log.error("No rank required for command " + getName() + ". Command will not work.");
-            return;
-        }
-
-        if (!rankRegistry.matchByName(commandConfig.getRequiredRanks().get(getName())).isPresent()) {
-            log.error("Invalid rank for command {0}: {1}. Command will not work.",
-                    getName(), commandConfig.getRequiredRanks().get(getName()));
-            return;
-        }
-
+        permissionManager.registerPermission("command." + getName() + ".execute", defaultPermission);
         super.register();
     }
 
@@ -79,17 +73,15 @@ public abstract class BaseCommand extends Command {
 
         if (sender instanceof Player) {
             val user = registry.get((Player) sender);
-            val rank = getRequiredRank();
-            if (user == null || user.getRank().getWeight() < rank.getWeight()) {
-                throw new MissingPermissionException(rank.getName());
+            val weight = getRequiredPerm();
+            if (user == null || user.getRank().getWeight() < weight) {
+                throw new MissingPermissionException("");
             }
         }
     }
 
-    protected Rank getRequiredRank() {
-        return rankRegistry.matchByName(commandConfig.getRequiredRanks().get(getName()))
-                .orElseThrow(() -> new IllegalStateException("Illegal rank received for command " + getName()
-                        + ": " + commandConfig.getRequiredRanks().get(getName())));
+    protected int getRequiredPerm() {
+        return permissionManager.getPermission("command." + getName() + ".execute", defaultPermission);
     }
 
     protected void sendMessage(CommandSender sender, String message, Object... replacements) {
@@ -129,7 +121,7 @@ public abstract class BaseCommand extends Command {
 
         Bukkit.getOnlinePlayers().stream()
                 .filter(it -> it != sender)
-                .filter(it -> registry.get(it).getRank().getWeight() >= getRequiredRank().getWeight())
+                .filter(it -> registry.get(it).getRank().getWeight() >= getRequiredPerm())
                 .forEach(it -> sendMessage(it, others, placeholders));
     }
 

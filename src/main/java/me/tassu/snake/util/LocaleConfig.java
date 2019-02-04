@@ -60,6 +60,9 @@ public class LocaleConfig extends Config<LocaleConfig> {
         @Setting("permission")
         private String permissionMessage = Chat.RED + "Your permission level does not permit this.";
 
+        @Setting("unknown-command")
+        private String unknownCommandMessage = Chat.YELLOW + "Unknown command, please try " + Chat.WHITE + "/help" + Chat.YELLOW + ".";
+
         // experience
         @Setting("experience-gain")
         private String experienceGainMessage = Chat.GOLD + Chat.PLUS + Chat.YELLOW + " Gained " + Chat.UNDERLINE + "{0} experience"
@@ -124,6 +127,30 @@ public class LocaleConfig extends Config<LocaleConfig> {
 
         @Setting("rank-admin-modified-rank")
         private Message rankAdminRankModified = of(Chat.YELLOW, "Modified rank ''{0}''" + Chat.YELLOW + ": set {1} to {2}" + Chat.YELLOW + ".");
+
+        /// permissionadmin
+
+        @Setting("permission-admin-help")
+        private List<String> permAdminHelp = Lists.newArrayList("",
+                Chat.YELLOW + "Help for " + Chat.BOLD + "/permissionadmin",
+                "",
+                Chat.GRAY + "/permissionadmin list" + Chat.ITALIC + " (used to list all permissions)",
+                Chat.GRAY + "/permissionadmin set " + Chat.WHITE + "[name] [value]" + Chat.GRAY + Chat.ITALIC + " (used to set permission value)",
+                ""
+        );
+
+        @Setting("permission-admin-list-header")
+        private String permAdminListHeader = Chat.YELLOW + "Listing all permissions:";
+
+        @Setting("permission-admin-list-entry")
+        private String permAdminListEntry = Chat.YELLOW + "= {0}" + Chat.YELLOW + " ({1})";
+
+        @Setting("permission-admin-no-such-rank")
+        private String permAdminInvalidRank = Chat.YELLOW + "No permissions found with that name.";
+
+        @Setting("permission-admin-set-value")
+        private Message permAdminSetValue = of(Chat.YELLOW, "Set permission ''{0}'' value to "
+                + Chat.UNDERLINE + "{1}" + Chat.RESET + Chat.YELLOW + ".");
 
         /// others
 

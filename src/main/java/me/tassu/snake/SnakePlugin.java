@@ -36,11 +36,12 @@ import me.tassu.snake.achievement.StandardAchievements;
 import me.tassu.snake.api.SnakeAPI;
 import me.tassu.snake.chat.ChatConfig;
 import me.tassu.snake.chat.ChatFormatter;
-import me.tassu.snake.cmd.meta.CommandConfig;
 import me.tassu.snake.achievement.AchievementListener;
 import me.tassu.snake.achievement.AchievementRegistry;
 import me.tassu.snake.cmd.staff.FlyCommand;
+import me.tassu.snake.cmd.staff.admin.PermissionCommand;
 import me.tassu.snake.cmd.staff.admin.RankCommand;
+import me.tassu.snake.perm.PermissionManager;
 import me.tassu.snake.user.level.ExperienceUtil;
 import me.tassu.snake.util.LocaleConfig;
 import me.tassu.snake.cmd.meta.NoPrefixedCommand;
@@ -57,6 +58,7 @@ import me.tassu.snake.user.UserSaver;
 import me.tassu.snake.user.rank.RankRegistry;
 import me.tassu.snake.user.rank.RankUtil;
 import me.tassu.snake.util.Messager;
+import me.tassu.snake.util.SettingUtil;
 
 public final class SnakePlugin extends EasyPlugin {
 
@@ -78,8 +80,10 @@ public final class SnakePlugin extends EasyPlugin {
         registerAll(
                 MongoConfig.class,
                 MongoManager.class,
+                SettingUtil.class,
                 UserRegistry.class,
                 UserSaver.class,
+                PermissionManager.class,
 
                 AchievementRegistry.class,
                 RankRegistry.class,
@@ -88,7 +92,6 @@ public final class SnakePlugin extends EasyPlugin {
                 ExperienceUtil.class,
                 RankUtil.class,
 
-                CommandConfig.class,
                 LocaleConfig.class,
                 ChatConfig.class,
 
@@ -101,6 +104,7 @@ public final class SnakePlugin extends EasyPlugin {
                 UptimeCommand.class,
                 HelpCommand.class,
 
+                PermissionCommand.class,
                 GameModeCommand.class,
                 SetRankCommand.class,
                 RankCommand.class,

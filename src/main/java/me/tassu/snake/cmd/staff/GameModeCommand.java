@@ -52,7 +52,7 @@ public class GameModeCommand extends PlayerTargetingCommand {
     private LocaleConfig locale;
 
     public GameModeCommand() {
-        super("gamemode");
+        super("gamemode", 50);
         this.defaultToSelf();
         this.requireArguments(1);
         this.setUsage("/gamemode [users=self] <mode>");

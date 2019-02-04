@@ -93,6 +93,10 @@ public abstract class PlayerTargetingCommand extends BaseCommand {
         super(name);
     }
 
+    public PlayerTargetingCommand(String name, int defaultPermission) {
+        super(name, defaultPermission);
+    }
+
     @Override
     public final void run(CommandSender sender, String label, List<String> args) throws CommandException {
         if (args.isEmpty() && useArguments && defaultToSelf && sender instanceof Player && requireArguments == 0) {
@@ -164,7 +168,7 @@ public abstract class PlayerTargetingCommand extends BaseCommand {
 
         Bukkit.getOnlinePlayers().stream()
                 .filter(it -> it != sender)
-                .filter(it -> registry.get(it).getRank().getWeight() >= getRequiredRank().getWeight())
+                .filter(it -> registry.get(it).getRank().getWeight() >= getRequiredPerm())
                 .forEach(it -> sendMessage(it, others, getPlaceholders(target)));
     }
 

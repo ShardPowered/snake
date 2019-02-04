@@ -34,11 +34,13 @@ import me.tassu.snake.achievement.Achievement;
 import me.tassu.snake.api.event.PostUserAchievementGainEvent;
 import me.tassu.snake.api.event.PostUserExperienceGainEvent;
 import me.tassu.snake.api.event.PostUserLevelUpEvent;
+import me.tassu.snake.api.event.PostUserReloadedEvent;
 import me.tassu.snake.user.level.ExperienceUtil;
 import me.tassu.snake.user.level.LevelUtil;
 import me.tassu.snake.user.rank.Rank;
 import me.tassu.snake.user.rank.RankRegistry;
 import me.tassu.snake.util.BSONUtil;
+import me.tassu.snake.util.SettingUtil;
 import org.bson.Document;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -82,6 +84,8 @@ public class User {
     private long totalExperience;
     private String userName;
 
+    private Document customDocument;
+
     @SuppressWarnings("WeakerAccess")
     public int getLevel() {
         return LevelUtil.getLevelForExp(totalExperience);
@@ -91,13 +95,19 @@ public class User {
         return LevelUtil.getProgress(totalExperience, getLevel());
     }
 
-    User(UUID uuid, Document document, RankRegistry rankRegistry, ExperienceUtil experienceUtil) {
+    User(UUID uuid, Document document, RankRegistry rankRegistry, ExperienceUtil experienceUtil, SettingUtil settingUtil) {
         Preconditions.checkNotNull(uuid);
 
         this.experienceUtil = experienceUtil;
         this.rankRegistry = rankRegistry;
 
         this.uuid = uuid;
+        this.addToSaveQueue(UserKey.UUID, uuid.toString());
+
+        this.reload(document);
+    }
+
+    public void reload(Document document) {
         this.rank = rankRegistry.byName(document.getString(UserKey.RANK));
 
         val firstJoin = document.getLong(UserKey.FIRST_JOIN);
@@ -113,12 +123,14 @@ public class User {
         this.achievements = achievementDoc.keySet().stream()
                 .collect(Collectors.toMap(Function.identity(), achievementDoc::getLong));
 
-        addToSaveQueue(UserKey.UUID, uuid.toString());
+        this.customDocument = BSONUtil.getSubDoc(document, UserKey.CUSTOM);
 
         getPlayer().ifPresent(player -> {
             setNickname(player.getName());
             updateTag();
         });
+
+        Bukkit.getPluginManager().callEvent(new PostUserReloadedEvent(this));
     }
 
     @SuppressWarnings({"UnusedReturnValue", "WeakerAccess"})
@@ -178,6 +190,11 @@ public class User {
         addToSaveQueue(UserKey.RANK, rank.getName());
     }
 
+    public void setCustomData(String key, Object value) {
+        this.customDocument.put(key, value);
+        this.addToSaveQueue(UserKey.CUSTOM + "." + key, value);
+    }
+
     public void updateTag() {
         this.getPlayer().ifPresent(player -> {
             if (rank.getTablistMode() == Rank.TablistMode.SHOW_PREFIX) {
@@ -209,5 +226,4 @@ public class User {
     public String getColoredName() {
         return getRank().getPrimary() + getUserName();
     }
-
 }

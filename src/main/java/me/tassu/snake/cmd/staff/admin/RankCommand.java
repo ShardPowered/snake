@@ -51,7 +51,7 @@ public class RankCommand extends BaseCommand {
     private LocaleConfig locale;
 
     public RankCommand() {
-        super("rankadmin");
+        super("rankadmin", 250);
         this.setUsage("/rankadmin help");
         this.setDescription("Used to manage ranks.");
     }

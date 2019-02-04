@@ -28,24 +28,32 @@ import com.google.common.collect.Maps;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.mongodb.client.model.UpdateOptions;
+import com.mongodb.client.model.changestream.ChangeStreamDocument;
+import com.mongodb.client.model.changestream.FullDocument;
+import com.mongodb.client.model.changestream.OperationType;
 import lombok.experimental.var;
 import lombok.val;
 import me.tassu.easy.log.Log;
 import me.tassu.easy.register.core.IRegistrable;
 import me.tassu.simple.TaskChainModule;
+import me.tassu.snake.SnakePlugin;
 import me.tassu.snake.api.event.AsyncUserJoinedEvent;
 import me.tassu.snake.api.event.SyncUserJoinedEvent;
 import me.tassu.snake.db.MongoManager;
 import me.tassu.snake.user.level.ExperienceUtil;
+import me.tassu.snake.user.rank.Rank;
 import me.tassu.snake.user.rank.RankRegistry;
+import me.tassu.snake.util.SettingUtil;
 import org.bson.Document;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.player.AsyncPlayerPreLoginEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.scheduler.BukkitScheduler;
 
 import java.util.*;
+import java.util.function.Consumer;
 
 import static com.mongodb.client.model.Filters.eq;
 
@@ -64,10 +72,40 @@ public class UserRegistry implements IRegistrable {
     private ExperienceUtil experienceUtil;
 
     @Inject
+    private SettingUtil settingUtil;
+
+    @Inject
     private Log log;
 
     @Inject
+    private SnakePlugin plugin;
+
+    @Inject
     private MongoManager mongo;
+
+    @Inject
+    private BukkitScheduler scheduler;
+
+    @Override
+    public void register() {
+        scheduler.runTaskAsynchronously(plugin, () -> {
+            val collection = mongo.getDatabase().getCollection(UserKey.COLLECTION);
+            collection.watch()
+                    .fullDocument(FullDocument.UPDATE_LOOKUP)
+                    .forEach((Consumer<ChangeStreamDocument<Document>>) change -> {
+                        if (change.getOperationType() == OperationType.DELETE) {
+                            return;
+                        }
+
+                        val document = change.getFullDocument();
+                        val id = UUID.fromString(document.getString("_id"));
+                        if (users.containsKey(id)) {
+                            users.get(id).reload(document);
+                        }
+                    });
+        });
+
+    }
 
     private Map<UUID, User> users = new WeakHashMap<>();
     private Map<UUID, Long> locked = Maps.newHashMap();
@@ -102,7 +140,7 @@ public class UserRegistry implements IRegistrable {
             return Optional.empty();
         }
 
-        val user = new User(UUID.fromString(document.getString(UserKey.UUID)), document, config, experienceUtil);
+        val user = new User(UUID.fromString(document.getString(UserKey.UUID)), document, config, experienceUtil, settingUtil);
         users.put(user.getUuid(), user);
         return Optional.of(user);
     }
@@ -117,7 +155,7 @@ public class UserRegistry implements IRegistrable {
                 document = new Document();
             }
 
-            users.put(uuid, new User(uuid, document, config, experienceUtil));
+            users.put(uuid, new User(uuid, document, config, experienceUtil, settingUtil));
         }
 
         return users.get(uuid);

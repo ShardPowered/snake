@@ -28,6 +28,8 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.val;
 import me.tassu.easy.register.core.IRegistrable;
+import me.tassu.snake.perm.PermissionManager;
+import me.tassu.snake.user.UserRegistry;
 import me.tassu.snake.util.Chat;
 import me.tassu.snake.util.LocaleConfig;
 import org.bukkit.event.EventHandler;
@@ -39,12 +41,22 @@ public class NoPrefixedCommand implements IRegistrable {
     @Inject
     private LocaleConfig locale;
 
+    @Inject
+    private PermissionManager permissionManager;
+
+    @Override
+    public void register() {
+        permissionManager.registerPermission("use-prefixed-command", 10);
+    }
+
     @EventHandler(ignoreCancelled = true)
     public void onCommand(PlayerCommandPreprocessEvent event) {
         val parts = event.getMessage().split(" ");
         if (parts[0].contains(":")) {
-            event.getPlayer().sendMessage(Chat.format(locale.getLocale().getNoPrefixing()));
-            event.setCancelled(true);
+            if (!permissionManager.hasPermission("use-prefixed-command", event.getPlayer())) {
+                event.getPlayer().sendMessage(Chat.format(locale.getLocale().getNoPrefixing()));
+                event.setCancelled(true);
+            }
         }
     }
 }

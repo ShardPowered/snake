@@ -22,28 +22,26 @@
  * SOFTWARE.
  */
 
-package me.tassu.snake.cmd.staff;
+package me.tassu.snake.api.event;
 
-import com.google.inject.Singleton;
-import me.tassu.easy.register.command.Aliases;
-import me.tassu.snake.cmd.meta.PlayerTargetingCommand;
-import org.bukkit.entity.Player;
+import me.tassu.snake.user.User;
+import org.bukkit.event.HandlerList;
 
-@Singleton
-@Aliases({"feed", "eat"})
-public class FeedCommand extends PlayerTargetingCommand {
+public class PostUserReloadedEvent extends BaseUserEvent {
 
-    public FeedCommand() {
-        super("feed", 10);
-        this.defaultToSelf();
-        this.setUsage("/feed [users=self]");
-        this.setDescription("Used to feed a player.");
+    public PostUserReloadedEvent(User user) {
+        super(user);
     }
 
+    private static final HandlerList handlers = new HandlerList();
+
     @Override
-    public void run(Player player) {
-        player.setFoodLevel(20);
-        player.setSaturation(20);
+    public HandlerList getHandlers() {
+        return handlers;
+    }
+
+    public static HandlerList getHandlerList() {
+        return handlers;
     }
 
 }

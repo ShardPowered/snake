@@ -28,9 +28,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.inject.Inject;
 import lombok.val;
 import me.tassu.easy.register.command.error.CommandException;
-import me.tassu.snake.cmd.meta.ex.UsageException;
 import me.tassu.snake.user.User;
-import me.tassu.snake.user.UserParser;
 import me.tassu.snake.user.UserRegistry;
 import me.tassu.snake.util.LocaleConfig;
 import me.tassu.util.ArrayUtil;
@@ -50,6 +48,10 @@ import java.util.stream.Collectors;
 public abstract class UserTargetingCommand extends BaseCommand {
     public UserTargetingCommand(String name) {
         super(name);
+    }
+
+    public UserTargetingCommand(String name, int defaultPermission) {
+        super(name, defaultPermission);
     }
 
     private boolean useArguments = false;
@@ -79,9 +81,6 @@ public abstract class UserTargetingCommand extends BaseCommand {
 
     @Inject
     private UserRegistry registry;
-
-    @Inject
-    private UserParser parser;
 
     @Inject
     private LocaleConfig locale;
@@ -140,7 +139,7 @@ public abstract class UserTargetingCommand extends BaseCommand {
 
         Bukkit.getOnlinePlayers().stream()
                 .filter(it -> it != sender)
-                .filter(it -> registry.get(it).getRank().getWeight() >= getRequiredRank().getWeight())
+                .filter(it -> registry.get(it).getRank().getWeight() >= getRequiredPerm())
                 .forEach(it -> sendMessage(it, others, getPlaceholders(target)));
     }
 

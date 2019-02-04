@@ -40,7 +40,7 @@ public class FlyCommand extends PlayerTargetingCommand {
     private LocaleConfig locale;
 
     public FlyCommand() {
-        super("fly");
+        super("fly", 10);
 
         this.setUsage("/fly [users] [on|off|toggle=toggle]");
         this.setDescription("Used to toggle flight mode for a player.");

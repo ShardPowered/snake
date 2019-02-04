@@ -75,4 +75,8 @@ public class SnakeAPI {
     @Inject
     private LocaleConfig localeConfig;
 
+    public LocaleConfig.Locale getLocale() {
+        return localeConfig.getLocale();
+    }
+
 }

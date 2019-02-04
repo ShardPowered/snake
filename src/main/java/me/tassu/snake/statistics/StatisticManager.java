@@ -22,32 +22,7 @@
  * SOFTWARE.
  */
 
-package me.tassu.snake.cmd.meta;
+package me.tassu.snake.statistics;
 
-import com.google.common.collect.ImmutableMap;
-import com.google.inject.Singleton;
-import lombok.Getter;
-import me.tassu.easy.register.config.Config;
-import ninja.leaping.configurate.objectmapping.Setting;
-
-import java.util.Map;
-
-@Getter
-@Singleton
-@Config.Name("commands")
-public class CommandConfig extends Config<CommandConfig> {
-
-    @Setting("permissions")
-    private Map<String, String> requiredRanks = ImmutableMap.<String, String>builder()
-            .put("help", "DEFAULT")
-            .put("uptime", "DEFAULT")
-            .put("setrank", "ADMIN")
-            .put("rankadmin", "ADMIN")
-            .put("gamemode", "ADMIN")
-            .put("fly", "MODERATOR")
-            .put("heal", "MODERATOR")
-            .put("feed", "MODERATOR")
-            .build();
-
-
+public class StatisticManager {
 }
